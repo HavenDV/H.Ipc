@@ -30,4 +30,36 @@ namespace {@class.Namespace}
     }}
 }}";
     }
+
+    public static string GenerateServerImplementation(ClassData @class)
+    {
+        return @$"
+using System;
+using H.Pipes;
+
+#nullable enable
+
+namespace {@class.Namespace}
+{{
+    public partial class {@class.Name}
+    {{
+        public void Initialize(H.Pipes.PipeServer<string> pipeServer)
+        {{
+            pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
+            pipeServer.MessageReceived += (_, args) =>
+            {{
+                var methodName = args.Message;
+                switch (methodName)
+                {{
+{string.Concat(@class.Methods.Select(static method => $@"
+                    case nameof({method.Name}):
+                        {method.Name}();
+                        break;
+"))}
+                }}
+            }};
+        }}
+    }}
+}}";
+    }
 }

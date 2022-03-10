@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using H.Pipes;
-using NamedPipesSample.Common;
 
 namespace H.Ipc.Apps.Wpf;
 

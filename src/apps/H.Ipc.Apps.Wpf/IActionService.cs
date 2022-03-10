@@ -1,16 +1,31 @@
-﻿namespace NamedPipesSample.Common
-{
-    public interface IActionService
-    {
-        //void SendText(string text);
-        void ShowTrayIcon();
-        void HideTrayIcon();
+﻿using System.Windows;
 
-        //event EventHandler<string> TextReceived;
+namespace H.Ipc.Apps.Wpf;
+
+public interface IActionService
+{
+    //void SendText(string text);
+    void ShowTrayIcon();
+    void HideTrayIcon();
+
+    //event EventHandler<string> TextReceived;
+}
+
+[H.IpcGenerators.IpcClient]
+public partial class ActionServiceClient : IActionService
+{
+}
+
+[H.IpcGenerators.IpcServer]
+public partial class ActionService : IActionService
+{
+    public void ShowTrayIcon()
+    {
+        MessageBox.Show(nameof(ShowTrayIcon));
     }
 
-    [H.IpcGenerators.IpcService]
-    public partial class ActionServiceClient : IActionService
+    public void HideTrayIcon()
     {
+        MessageBox.Show(nameof(HideTrayIcon));
     }
 }

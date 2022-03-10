@@ -14,6 +14,7 @@ public partial class ServerWindow
     #region Properties
 
     private PipeServer<string> Server { get; }
+    private ActionService ActionService { get; set; } = new();
 
     #endregion
 
@@ -36,6 +37,7 @@ public partial class ServerWindow
         {
             WriteLine($"{nameof(Server.ClientConnected)}: {args.Connection.PipeName}");
         };
+        ActionService.Initialize(Server);
     }
 
     #endregion

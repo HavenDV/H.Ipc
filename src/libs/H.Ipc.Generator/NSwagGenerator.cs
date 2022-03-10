@@ -11,13 +11,14 @@ public class NSwagGenerator : IIncrementalGenerator
 {
     #region Constants
 
-    private const string IpcServiceAttribute = "H.IpcGenerators.IpcServiceAttribute";
+    private const string IpcClientAttribute = "H.IpcGenerators.IpcClientAttribute";
+    private const string IpcServerAttribute = "H.IpcGenerators.IpcServerAttribute";
 
     #endregion
 
     #region Methods
 
-    private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
+    private static (ClassDeclarationSyntax Class, string FullName)? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
     {
         var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
 
@@ -32,9 +33,10 @@ public class NSwagGenerator : IIncrementalGenerator
 
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                if (fullName == IpcServiceAttribute)
+                if (fullName == IpcClientAttribute ||
+                    fullName == IpcServerAttribute)
                 {
-                    return classDeclarationSyntax;
+                    return (classDeclarationSyntax, fullName);
                 }
             }
         }
@@ -45,16 +47,25 @@ public class NSwagGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-               "IpcServiceAttribute.generated.cs",
+               "IpcClientAttribute.generated.cs",
                SourceText.From(@"
 namespace H.IpcGenerators
 {
     [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
-    public class IpcServiceAttribute : global::System.Attribute
+    public class IpcClientAttribute : global::System.Attribute
     {
     }
 }", Encoding.UTF8)));
-
+        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
+               "IpcServerAttribute.generated.cs",
+               SourceText.From(@"
+namespace H.IpcGenerators
+{
+    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
+    public class IpcServerAttribute : global::System.Attribute
+    {
+    }
+}", Encoding.UTF8)));
 
         var enumDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
@@ -71,20 +82,23 @@ namespace H.IpcGenerators
 
     private static void Execute(
         Compilation compilation,
-        ImmutableArray<ClassDeclarationSyntax> enums,
+        ImmutableArray<(ClassDeclarationSyntax Class, string FullName)?> classSyntaxes,
         SourceProductionContext context)
     {
-        if (enums.IsDefaultOrEmpty)
+        if (classSyntaxes.IsDefaultOrEmpty)
         {
             return;
         }
 
         try
         {
-            // I'm not sure if this is actually necessary, but `[LoggerMessage]` does it, so seems like a good idea!
-            var distinctEnums = enums.Distinct();
+            var distinctClassSyntaxes = classSyntaxes
+                .Where(static tuple => tuple!.Value.FullName == IpcClientAttribute)
+                .Select(static tuple => tuple!.Value.Class)
+                .Distinct()
+                .ToArray();
 
-            var classes = GetTypesToGenerate(compilation, distinctEnums, context.CancellationToken);
+            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
             foreach(var @class in classes)
             {
                 var code = SourceGenerationHelper.GenerateClientImplementation(@class);
@@ -93,10 +107,38 @@ namespace H.IpcGenerators
                     $"{@class.Name}.generated.cs",
                     SourceText.From(code, Encoding.UTF8));
             }
+        }
+        catch (Exception exception)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "IPCG0001",
+                        "Exception: ",
+                        $"{exception}",
+                        "Usage",
+                        DiagnosticSeverity.Error,
+                        true),
+                    Location.None));
+        }
 
-            //context.AddSource(
-            //    "test.generated.cs",
-            //    SourceText.From("test", Encoding.UTF8));
+        try
+        {
+            var distinctClassSyntaxes = classSyntaxes
+                .Where(static tuple => tuple!.Value.FullName == IpcServerAttribute)
+                .Select(static tuple => tuple!.Value.Class)
+                .Distinct()
+                .ToArray();
+
+            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
+            foreach (var @class in classes)
+            {
+                var code = SourceGenerationHelper.GenerateServerImplementation(@class);
+
+                context.AddSource(
+                    $"{@class.Name}.generated.cs",
+                    SourceText.From(code, Encoding.UTF8));
+            }
         }
         catch (Exception exception)
         {
@@ -119,7 +161,7 @@ namespace H.IpcGenerators
         CancellationToken cancellationToken)
     {
         var enumsToGenerate = new List<ClassData>();
-        var enumAttribute = compilation.GetTypeByMetadataName(IpcServiceAttribute);
+        var enumAttribute = compilation.GetTypeByMetadataName(IpcClientAttribute);
         if (enumAttribute == null)
         {
             return enumsToGenerate;
