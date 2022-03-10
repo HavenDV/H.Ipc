@@ -1,60 +1,175 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace H.NSwag.Generator;
+namespace H.Ipc.Generator;
 
 [Generator]
-public class NSwagGenerator : ISourceGenerator
+public class NSwagGenerator : IIncrementalGenerator
 {
-    #region Methods
+    #region Constants
 
-    public void Execute(GeneratorExecutionContext context)
-    {
-        foreach (var text in context.AdditionalFiles
-            .Where(static text => text.Path.EndsWith(
-                ".nswag",
-                StringComparison.InvariantCultureIgnoreCase)))
-        {
-            try
-            {
-                context.AddSource(
-                    $"{Path.GetFileName(text.Path)}.cs",
-                    SourceText.From("", Encoding.UTF8));
-            }
-            catch (Exception exception)
-            {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "NSG0001",
-                            "Exception: ",
-                            $"{exception}",
-                            "Usage",
-                            DiagnosticSeverity.Error,
-                            true),
-                        Location.None));
-            }
-        }
-    }
-
-    public void Initialize(GeneratorInitializationContext context)
-    {
-    }
+    private const string IpcServiceAttribute = "H.IpcGenerators.IpcServiceAttribute";
 
     #endregion
 
-    #region Utilities
+    #region Methods
 
-    private static string? GetGlobalOption(GeneratorExecutionContext context, string name)
+    private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
     {
-        return context.AnalyzerConfigOptions.GlobalOptions.TryGetValue(
-            $"build_property.{nameof(NSwagGenerator)}_{name}",
-            out var result) &&
-            !string.IsNullOrWhiteSpace(result)
-            ? result
-            : null;
+        var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
+
+        foreach (var attributeListSyntax in classDeclarationSyntax.AttributeLists)
+        {
+            foreach (var attributeSyntax in attributeListSyntax.Attributes)
+            {
+                if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
+                {
+                    continue;
+                }
+
+                var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
+                var fullName = attributeContainingTypeSymbol.ToDisplayString();
+                if (fullName == IpcServiceAttribute)
+                {
+                    return classDeclarationSyntax;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
+               "IpcServiceAttribute.generated.cs",
+               SourceText.From(@"
+namespace H.IpcGenerators
+{
+    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
+    public class IpcServiceAttribute : global::System.Attribute
+    {
+    }
+}", Encoding.UTF8)));
+
+
+        var enumDeclarations = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (node, _) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
+                transform: static (context, _) => GetSemanticTargetForGeneration(context))
+            .Where(static syntax => syntax is not null);
+
+        var compilationAndEnums = context.CompilationProvider.Combine(enumDeclarations.Collect());
+
+        context.RegisterSourceOutput(
+            compilationAndEnums,
+            static (context, source) => Execute(source.Left, source.Right!, context));
+    }
+
+    private static void Execute(
+        Compilation compilation,
+        ImmutableArray<ClassDeclarationSyntax> enums,
+        SourceProductionContext context)
+    {
+        if (enums.IsDefaultOrEmpty)
+        {
+            return;
+        }
+
+        try
+        {
+            // I'm not sure if this is actually necessary, but `[LoggerMessage]` does it, so seems like a good idea!
+            var distinctEnums = enums.Distinct();
+
+            var classes = GetTypesToGenerate(compilation, distinctEnums, context.CancellationToken);
+            foreach(var @class in classes)
+            {
+                var code = SourceGenerationHelper.GenerateClientImplementation(@class);
+
+                context.AddSource(
+                    $"{@class.Name}.generated.cs",
+                    SourceText.From(code, Encoding.UTF8));
+            }
+
+            //context.AddSource(
+            //    "test.generated.cs",
+            //    SourceText.From("test", Encoding.UTF8));
+        }
+        catch (Exception exception)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "IPCG0001",
+                        "Exception: ",
+                        $"{exception}",
+                        "Usage",
+                        DiagnosticSeverity.Error,
+                        true),
+                    Location.None));
+        }
+    }
+
+    private static List<ClassData> GetTypesToGenerate(
+        Compilation compilation,
+        IEnumerable<ClassDeclarationSyntax> enums,
+        CancellationToken cancellationToken)
+    {
+        var enumsToGenerate = new List<ClassData>();
+        var enumAttribute = compilation.GetTypeByMetadataName(IpcServiceAttribute);
+        if (enumAttribute == null)
+        {
+            return enumsToGenerate;
+        }
+
+        foreach (var classDeclarationSyntax in enums)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
+            if (semanticModel.GetDeclaredSymbol(
+                classDeclarationSyntax, cancellationToken) is not INamedTypeSymbol classSymbol)
+            {
+                continue;
+            }
+
+            // Get the full type name of the enum e.g. Colour, 
+            // or OuterClass<T>.Colour if it was nested in a generic type (for example)
+            var fullClassName = classSymbol.ToString();
+            var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
+            var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
+            
+            var methods = classDeclarationSyntax
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .ToArray();
+
+            // Get all the members in the enum
+            //var enumMembers = classSymbol.GetMembers();
+            //var members = new List<string>(enumMembers.Length);
+
+            //// Get all the fields from the enum, and add their name to the list
+            //foreach (ISymbol member in enumMembers)
+            //{
+            //    if (member is IFieldSymbol field && field.ConstantValue is not null)
+            //    {
+            //        members.Add(member.Name);
+            //    }
+            //}
+
+            enumsToGenerate.Add(new ClassData(@namespace, className, methods));
+        }
+
+        return enumsToGenerate;
     }
 
     #endregion
 }
+
+public readonly record struct ClassData(
+    string Namespace,
+    string Name,
+    IReadOnlyCollection<MethodDeclarationSyntax> Methods);

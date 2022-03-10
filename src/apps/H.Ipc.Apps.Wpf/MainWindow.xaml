@@ -1,0 +1,19 @@
+﻿<Window
+    x:Class="H.Ipc.Apps.Wpf.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="MainWindow"
+    SizeToContent="WidthAndHeight"
+    WindowStartupLocation="CenterScreen"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    >
+    <GroupBox Header="Select mode">
+        <StackPanel Width="400" VerticalAlignment="Center">
+            <Button Content="Client" Click="ClientButton_Click"/>
+            <Button Content="Server" Click="ServerButton_Click"/>
+        </StackPanel>
+    </GroupBox>
+</Window>
