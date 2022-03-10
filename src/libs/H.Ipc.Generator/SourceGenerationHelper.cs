@@ -14,7 +14,12 @@ namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        public PipeClient<string>? Client {{ get; set; }}
+        private PipeClient<string>? Client {{ get; set; }}
+
+        public void Initialize(PipeClient<string> pipeClient)
+        {{
+            Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
+        }}
 
 {string.Concat(@class.Methods.Select(static method => $@"
         public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static x => $"{x.Type} {x.Name}"))})
@@ -43,7 +48,7 @@ namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        public void Initialize(H.Pipes.PipeServer<string> pipeServer)
+        public void Initialize(PipeServer<string> pipeServer)
         {{
             pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
             pipeServer.MessageReceived += (_, args) =>

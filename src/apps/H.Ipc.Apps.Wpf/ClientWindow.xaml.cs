@@ -8,7 +8,7 @@ public partial class ClientWindow
     #region Properties
 
     private PipeClient<string> Client { get; }
-    private ActionServiceClient ActionServiceClient { get; set; }
+    private ActionServiceClient ActionServiceClient { get; set; } = new();
 
     #endregion
 
@@ -31,11 +31,7 @@ public partial class ClientWindow
         {
             WriteLine($"{nameof(Client.Disconnected)}");
         };
-
-        ActionServiceClient = new ActionServiceClient
-        {
-            Client = Client,
-        };
+        ActionServiceClient.Initialize(Client);
 
     }
 
