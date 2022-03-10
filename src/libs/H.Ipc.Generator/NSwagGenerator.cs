@@ -136,17 +136,18 @@ namespace H.IpcGenerators
                 continue;
             }
 
+            var @interface = classSymbol.Interfaces.First();
+            var methods = @interface
+                .GetMembers()
+                .OfType<IMethodSymbol>()
+                .ToArray();
+            
             // Get the full type name of the enum e.g. Colour, 
             // or OuterClass<T>.Colour if it was nested in a generic type (for example)
             var fullClassName = classSymbol.ToString();
             var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
             var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
             
-            var methods = classDeclarationSyntax
-                .DescendantNodes()
-                .OfType<MethodDeclarationSyntax>()
-                .ToArray();
-
             // Get all the members in the enum
             //var enumMembers = classSymbol.GetMembers();
             //var members = new List<string>(enumMembers.Length);
@@ -172,4 +173,4 @@ namespace H.IpcGenerators
 public readonly record struct ClassData(
     string Namespace,
     string Name,
-    IReadOnlyCollection<MethodDeclarationSyntax> Methods);
+    IReadOnlyCollection<IMethodSymbol> Methods);

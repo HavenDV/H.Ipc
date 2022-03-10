@@ -78,11 +78,11 @@ public partial class ClientWindow
         }
     }
 
-    private async void RaiseEvent1Button_Click(object sender, RoutedEventArgs e)
+    private void RaiseEvent1Button_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            await ActionServiceClient.ShowTrayIconAsync().ConfigureAwait(false);
+            ActionServiceClient.ShowTrayIcon();
             //if (Instance == null)
             //{
             //    return;
@@ -97,11 +97,11 @@ public partial class ClientWindow
         }
     }
 
-    private async void RaiseEvent3Button_Click(object sender, RoutedEventArgs e)
+    private void RaiseEvent3Button_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            await ActionServiceClient.HideTrayIconAsync().ConfigureAwait(false);
+            ActionServiceClient.HideTrayIcon();
             //if (Instance == null)
             //{
             //    return;

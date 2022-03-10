@@ -17,14 +17,14 @@ namespace {@class.Namespace}
         public PipeClient<string>? Client {{ get; set; }}
 
 {string.Concat(@class.Methods.Select(static method => $@"
-        public partial async {method.ReturnType.GetText()} {method.Identifier.Text}{method.ParameterList}
+        public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static x => $"{x.Type} {x.Name}"))})
         {{
             if (Client == null)
             {{
                 return;
             }}
 
-            await Client.WriteAsync(""{method.Identifier.Text}"").ConfigureAwait(false);
+            await Client.WriteAsync(""{method.Name}"").ConfigureAwait(false);
         }}
 "))}
     }}

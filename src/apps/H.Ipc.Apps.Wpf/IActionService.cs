@@ -10,10 +10,7 @@
     }
 
     [H.IpcGenerators.IpcService]
-    public partial class ActionServiceClient
+    public partial class ActionServiceClient : IActionService
     {
-        public partial Task ShowTrayIconAsync(CancellationToken cancellationToken = default);
-
-        public partial Task HideTrayIconAsync(CancellationToken cancellationToken = default);
     }
 }
