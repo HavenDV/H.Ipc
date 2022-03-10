@@ -1,9 +1,10 @@
-# [H.Ipc](https://github.com/HavenDV/H.Ipc/) 
+# H.Ipc.Generator
 
-[![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/H.Ipc/search?l=C%23&o=desc&s=&type=Code)
-[![License](https://img.shields.io/github/license/HavenDV/H.Ipc.svg?label=License&maxAge=86400)](LICENSE.md)
-[![Build Status](https://github.com/HavenDV/H.Ipc/workflows/.NET/badge.svg?branch=master)](https://github.com/HavenDV/H.Ipc/actions?query=workflow%3A%22.NET%22)
-[![NuGet](https://img.shields.io/nuget/dt/H.Ipc.svg?style=flat-square&label=H.Ipc)](https://www.nuget.org/packages/H.Ipc/)
+### Nuget
+[![NuGet](https://img.shields.io/nuget/dt/H.Ipc.Generator.svg?style=flat-square&label=H.Ipc.Generator)](https://www.nuget.org/packages/H.Ipc.Generator/)
+```
+Install-Package H.Ipc.Generator
+```
 
 ### Usage
 ```cs
