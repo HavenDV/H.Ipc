@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace H.Ipc.Generator;
 
 [Generator]
-public class NSwagGenerator : IIncrementalGenerator
+public class HIpcGenerator : IIncrementalGenerator
 {
     #region Constants
 
@@ -49,6 +49,8 @@ public class NSwagGenerator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
                "IpcClientAttribute.generated.cs",
                SourceText.From(@"
+#nullable enable
+
 namespace H.IpcGenerators
 {
     [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
@@ -59,6 +61,8 @@ namespace H.IpcGenerators
         context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
                "IpcServerAttribute.generated.cs",
                SourceText.From(@"
+#nullable enable
+
 namespace H.IpcGenerators
 {
     [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
