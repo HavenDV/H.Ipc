@@ -37,16 +37,16 @@ public partial class ActionServiceClient : IActionService
 }
 
 // Server initialization
-var server = new PipeServer<string>(ServerName);
+await using var server = new PipeServer<string>(ServerName);
 var service = new ActionService();
 service.Initialize(server);
 await server.StartAsync();
 
 // Client initialization
-var client = new PipeClient<string>(ServerName);
+await using var client = new PipeClient<string>(ServerName);
 var service = new ActionServiceClient();
-service.Initialize(pipeClient);
-await server.ConnectAsync();
+service.Initialize(client);
+await client.ConnectAsync();
 
 // Client usage
 client.ShowTrayIcon();
