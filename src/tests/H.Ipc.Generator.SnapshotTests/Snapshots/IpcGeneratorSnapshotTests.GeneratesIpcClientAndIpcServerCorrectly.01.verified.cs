@@ -17,30 +17,34 @@ namespace H.Ipc.Apps.Wpf
             pipeServer.MessageReceived += (_, args) =>
             {
                 var json = args.Message ?? throw new InvalidOperationException("Message is null.");
-                var method = Deserialize<RunMethodRequest>(json);
+                var request = Deserialize<RpcRequest>(json);
 
-                switch (method.Name)
+                if (request.Type == RpcRequestType.RunMethod)
                 {
-                    case nameof(ShowTrayIcon):
-                        {
-                            var arguments = Deserialize<ShowTrayIconMethod>(json);
-                            ShowTrayIcon();
-                            break;
-                        }
+                    var method = Deserialize<RunMethodRequest>(json);
+                    switch (method.Name)
+                    {
+                        case nameof(ShowTrayIcon):
+                            {
+                                var arguments = Deserialize<ShowTrayIconMethod>(json);
+                                ShowTrayIcon();
+                                break;
+                            }
 
-                    case nameof(HideTrayIcon):
-                        {
-                            var arguments = Deserialize<HideTrayIconMethod>(json);
-                            HideTrayIcon();
-                            break;
-                        }
+                        case nameof(HideTrayIcon):
+                            {
+                                var arguments = Deserialize<HideTrayIconMethod>(json);
+                                HideTrayIcon();
+                                break;
+                            }
 
-                    case nameof(SendText):
-                        {
-                            var arguments = Deserialize<SendTextMethod>(json);
-                            SendText(arguments.Text);
-                            break;
-                        }
+                        case nameof(SendText):
+                            {
+                                var arguments = Deserialize<SendTextMethod>(json);
+                                SendText(arguments.Text);
+                                break;
+                            }
+                    }
                 }
             };
         }

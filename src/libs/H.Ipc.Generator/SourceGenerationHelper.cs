@@ -86,18 +86,22 @@ namespace {@class.Namespace}
             pipeServer.MessageReceived += (_, args) =>
             {{
                 var json = args.Message ?? throw new InvalidOperationException(""Message is null."");
-                var method = Deserialize<RunMethodRequest>(json);
+                var request = Deserialize<RpcRequest>(json);
 
-                switch (method.Name)
+                if (request.Type == RpcRequestType.RunMethod)
                 {{
+                    var method = Deserialize<RunMethodRequest>(json);
+                    switch (method.Name)
+                    {{
 {@class.Methods.Select(static method => $@"
-                    case nameof({method.Name}):
-                        {{
-                            var arguments = Deserialize<{method.Name}Method>(json);
-                            {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"arguments.{parameter.Name.ToPropertyName()}")).TrimEnd(',', ' ', '\n', '\r')});
-                            break;
-                        }}
+                        case nameof({method.Name}):
+                            {{
+                                var arguments = Deserialize<{method.Name}Method>(json);
+                                {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"arguments.{parameter.Name.ToPropertyName()}")).TrimEnd(',', ' ', '\n', '\r')});
+                                break;
+                            }}
 ").Inject()}
+                    }}
                 }}
             }};
         }}
