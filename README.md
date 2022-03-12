@@ -13,6 +13,7 @@ public interface IActionService
 {
     void ShowTrayIcon();
     void HideTrayIcon();
+    void SendText(string text);
 }
 
 // Server side implementation
@@ -27,6 +28,11 @@ public partial class ActionService : IActionService
     public void HideTrayIcon()
     {
         MessageBox.Show(nameof(HideTrayIcon));
+    }
+
+    public void SendText(string text)
+    {
+        MessageBox.Show(text);
     }
 }
 
