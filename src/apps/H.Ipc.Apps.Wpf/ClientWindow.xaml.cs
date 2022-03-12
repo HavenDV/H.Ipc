@@ -133,13 +133,7 @@ public partial class ClientWindow
     {
         try
         {
-            //if (Instance == null)
-            //{
-            //    return;
-            //}
-
-            //var result = Instance.Method2(Method2ArgumentTextBox.Text);
-            //WriteLine($"{nameof(Instance.Method2)}: {result}");
+            ActionServiceClient.SendText(Method2ArgumentTextBox.Text);
         }
         catch (Exception exception)
         {

@@ -4,7 +4,7 @@ namespace H.Ipc.Apps.Wpf;
 
 public interface IActionService
 {
-    //void SendText(string text);
+    void SendText(string text);
     void ShowTrayIcon();
     void HideTrayIcon();
 
@@ -27,5 +27,10 @@ public partial class ActionService : IActionService
     public void HideTrayIcon()
     {
         MessageBox.Show(nameof(HideTrayIcon));
+    }
+
+    public void SendText(string text)
+    {
+        MessageBox.Show(text);
     }
 }

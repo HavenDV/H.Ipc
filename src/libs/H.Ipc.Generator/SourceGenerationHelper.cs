@@ -24,16 +24,21 @@ namespace {@class.Namespace}
         }}
 
 {string.Concat(@class.Methods.Select(static method => $@"
-        public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static x => $"{x.Type} {x.Name}"))})
+        public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
-            await WriteAsync(new RpcMethod
+            await WriteAsync(new {method.Name}Method(
+{string.Concat(method.Parameters.Select(static parameter => $@"
+                {parameter.Name},
+")).TrimEnd(',', ' ', '\n', '\r')}            
+            )
             {{
                 Name = ""{method.Name}"",
             }}).ConfigureAwait(false);
         }}
 "))}
 
-        private async Task WriteAsync(RpcMethod method, CancellationToken cancellationToken = default)
+        private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
+            where T : RpcMethod
         {{
             if (Client == null)
             {{
@@ -45,6 +50,27 @@ namespace {@class.Namespace}
             await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }}
     }}
+
+{string.Concat(@class.Methods.Select(static method => $@"
+    public class {method.Name}Method : RpcMethod
+    {{
+{string.Concat(method.Parameters.Select(static parameter => $@"
+        public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
+"))}
+
+        public {method.Name}Method(
+{string.Concat(method.Parameters.Select(static parameter => $@"
+            {parameter.Type} {parameter.Name},
+")).TrimEnd(',', ' ', '\n', '\r')}
+            )
+        {{
+{string.Concat(method.Parameters.Select(static parameter => $@"
+            {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new ArgumentNullException(nameof({parameter.Name}));
+"))}
+        }}
+    }}
+"))}
+
 }}";
     }
 
@@ -74,8 +100,15 @@ namespace {@class.Namespace}
                 {{
 {string.Concat(@class.Methods.Select(static method => $@"
                     case nameof({method.Name}):
-                        {method.Name}();
+                    {{
+                        var arguments = Deserialize<{method.Name}Method>(json);
+                        {method.Name}(
+{string.Concat(method.Parameters.Select(static parameter => $@"
+                            arguments.{parameter.Name.ToPropertyName()},
+")).TrimEnd(',', ' ', '\n', '\r')}
+                            );
                         break;
+                    }}
 "))}
                 }}
             }};
