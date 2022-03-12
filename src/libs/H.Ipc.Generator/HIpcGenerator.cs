@@ -46,31 +46,6 @@ public class HIpcGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-               "IpcClientAttribute.generated.cs",
-               SourceText.From(@"
-#nullable enable
-
-namespace H.IpcGenerators
-{
-    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
-    public class IpcClientAttribute : global::System.Attribute
-    {
-    }
-}", Encoding.UTF8)));
-        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-               "IpcServerAttribute.generated.cs",
-               SourceText.From(@"
-#nullable enable
-
-namespace H.IpcGenerators
-{
-    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
-    public class IpcServerAttribute : global::System.Attribute
-    {
-    }
-}", Encoding.UTF8)));
-
         var enumDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 predicate: static (node, _) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 },

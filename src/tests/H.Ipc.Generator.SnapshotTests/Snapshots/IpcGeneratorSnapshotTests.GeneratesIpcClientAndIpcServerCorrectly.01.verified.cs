@@ -1,11 +1,33 @@
-﻿//HintName: IpcServerAttribute.generated.cs
+﻿//HintName: ActionService.generated.cs
+
+using System;
+using H.Pipes;
 
 #nullable enable
 
-namespace H.IpcGenerators
+namespace H.Ipc.Apps.Wpf
 {
-    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
-    public class IpcServerAttribute : global::System.Attribute
+    public partial class ActionService
     {
+        public void Initialize(PipeServer<string> pipeServer)
+        {
+            pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
+            pipeServer.MessageReceived += (_, args) =>
+            {
+                var methodName = args.Message;
+                switch (methodName)
+                {
+
+                    case nameof(ShowTrayIcon):
+                        ShowTrayIcon();
+                        break;
+
+                    case nameof(HideTrayIcon):
+                        HideTrayIcon();
+                        break;
+
+                }
+            };
+        }
     }
 }

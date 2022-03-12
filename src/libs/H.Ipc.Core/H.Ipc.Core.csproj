@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net4.5.1;net5.0;net6.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet">
+    <Description>Core library for Inter-Process Communication.</Description>
+    <PackageTags>ipc, generator, source generator, csharp 9</PackageTags>
+  </PropertyGroup>
+
+</Project>

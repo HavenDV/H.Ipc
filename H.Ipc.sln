@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Apps.Wpf", "src\apps\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Generator.SnapshotTests", "src\tests\H.Ipc.Generator.SnapshotTests\H.Ipc.Generator.SnapshotTests.csproj", "{800AFF76-1B2B-41F6-8566-18E86D4F13F5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Core", "src\libs\H.Ipc.Core\H.Ipc.Core.csproj", "{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{800AFF76-1B2B-41F6-8566-18E86D4F13F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{800AFF76-1B2B-41F6-8566-18E86D4F13F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{800AFF76-1B2B-41F6-8566-18E86D4F13F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{3B17FE3E-7DFC-4008-8F3C-492D215A5EBD} = {9CAA231D-7BE1-46C9-ACD6-EB2E569CEBEA}
 		{D677E408-7A0E-4C49-B724-61BA2AE37F79} = {99D7C11B-069F-4BDF-896C-41697FA63132}
 		{800AFF76-1B2B-41F6-8566-18E86D4F13F5} = {9CAA231D-7BE1-46C9-ACD6-EB2E569CEBEA}
+		{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1493AEE4-9211-46E9-BFE6-8F629EAC5693}

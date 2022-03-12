@@ -1,11 +1,41 @@
-﻿//HintName: IpcClientAttribute.generated.cs
+﻿//HintName: ActionServiceClient.generated.cs
+
+using System;
+using H.Pipes;
 
 #nullable enable
 
-namespace H.IpcGenerators
+namespace H.Ipc.Apps.Wpf
 {
-    [global::System.AttributeUsage(global::System.AttributeTargets.Class)]
-    public class IpcClientAttribute : global::System.Attribute
+    public partial class ActionServiceClient
     {
+        private PipeClient<string>? Client { get; set; }
+
+        public void Initialize(PipeClient<string> pipeClient)
+        {
+            Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
+        }
+
+
+        public async void ShowTrayIcon()
+        {
+            if (Client == null)
+            {
+                return;
+            }
+
+            await Client.WriteAsync("ShowTrayIcon").ConfigureAwait(false);
+        }
+
+        public async void HideTrayIcon()
+        {
+            if (Client == null)
+            {
+                return;
+            }
+
+            await Client.WriteAsync("HideTrayIcon").ConfigureAwait(false);
+        }
+
     }
 }
