@@ -24,7 +24,13 @@ public class IpcGeneratorIntegrationTests
 
         // Client usage
         serviceClient.ShowTrayIcon();
+        serviceClient.HideTrayIcon();
+        serviceClient.SendText("Hello, World!");
 
         await Task.Delay(TimeSpan.FromSeconds(5));
+
+        service.ShowTrayIconResult.Should().BeTrue();
+        service.HideTrayIconResult.Should().BeTrue();
+        service.SendTextResult.Should().Be("Hello, World!");
     }
 }
