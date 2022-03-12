@@ -13,6 +13,7 @@ public interface IActionService
 {
     void ShowTrayIcon();
     void HideTrayIcon();
+    void SendText(string text);
 }
 
 [H.IpcGenerators.IpcClient]
@@ -28,6 +29,10 @@ public partial class ActionService : IActionService
     }
 
     public void HideTrayIcon()
+    {
+    }
+
+    public void SendText(string text)
     {
     }
 }");

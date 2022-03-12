@@ -30,6 +30,11 @@ namespace H.Ipc.Apps.Wpf
             await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
         }
 
+        public async void SendText(string text)
+        {
+            await WriteAsync(new SendTextMethod(text)).ConfigureAwait(false);
+        }
+
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
             where T : RpcMethod
         {
@@ -63,6 +68,17 @@ namespace H.Ipc.Apps.Wpf
         {
             Name = "HideTrayIcon";
 
+        }
+    }
+
+    public class SendTextMethod : RpcMethod
+    {
+        public string Text { get; set; }
+
+        public SendTextMethod(string text)
+        {
+            Name = "SendText";
+            Text = text ?? throw new ArgumentNullException(nameof(text));
         }
     }
 

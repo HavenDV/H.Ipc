@@ -34,6 +34,13 @@ namespace H.Ipc.Apps.Wpf
                             HideTrayIcon();
                             break;
                         }
+
+                    case nameof(SendText):
+                        {
+                            var arguments = Deserialize<SendTextMethod>(json);
+                            SendText(arguments.Text);
+                            break;
+                        }
                 }
             };
         }
