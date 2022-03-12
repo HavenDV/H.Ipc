@@ -2,6 +2,8 @@
 
 using System;
 using H.Pipes;
+using System.Text.Json;
+using H.IpcGenerators;
 
 #nullable enable
 
@@ -14,20 +16,35 @@ namespace H.Ipc.Apps.Wpf
             pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
             pipeServer.MessageReceived += (_, args) =>
             {
-                var methodName = args.Message;
-                switch (methodName)
-                {
+                var json = args.Message ?? throw new InvalidOperationException("Message is null.");
+                var method = Deserialize<RpcMethod>(json);
 
+                switch (method.Name)
+                {
                     case nameof(ShowTrayIcon):
-                        ShowTrayIcon();
-                        break;
+                        {
+                            var arguments = Deserialize<ShowTrayIconMethod>(json);
+                            ShowTrayIcon();
+                            break;
+                        }
 
                     case nameof(HideTrayIcon):
-                        HideTrayIcon();
-                        break;
-
+                        {
+                            var arguments = Deserialize<HideTrayIconMethod>(json);
+                            HideTrayIcon();
+                            break;
+                        }
                 }
             };
+        }
+
+        private static T Deserialize<T>(string json)
+        {
+            return
+                JsonSerializer.Deserialize<T>(json) ??
+                throw new ArgumentException($@"Returned null when trying to deserialize to {typeof(T)}.
+    json:
+    {json}");
         }
     }
 }

@@ -2,6 +2,10 @@
 
 using System;
 using H.Pipes;
+using System.Text.Json;
+using H.IpcGenerators;
+using System.Threading;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -16,26 +20,50 @@ namespace H.Ipc.Apps.Wpf
             Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
         }
 
-
         public async void ShowTrayIcon()
         {
-            if (Client == null)
-            {
-                return;
-            }
-
-            await Client.WriteAsync("ShowTrayIcon").ConfigureAwait(false);
+            await WriteAsync(new ShowTrayIconMethod()).ConfigureAwait(false);
         }
 
         public async void HideTrayIcon()
         {
+            await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
+        }
+
+        private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
+            where T : RpcMethod
+        {
             if (Client == null)
             {
                 return;
             }
 
-            await Client.WriteAsync("HideTrayIcon").ConfigureAwait(false);
-        }
+            var json = JsonSerializer.Serialize(method);
 
+            await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
+        }
     }
+
+    public class ShowTrayIconMethod : RpcMethod
+    {
+
+
+        public ShowTrayIconMethod()
+        {
+            Name = "ShowTrayIcon";
+
+        }
+    }
+
+    public class HideTrayIconMethod : RpcMethod
+    {
+
+
+        public HideTrayIconMethod()
+        {
+            Name = "HideTrayIcon";
+
+        }
+    }
+
 }

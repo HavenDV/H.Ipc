@@ -9,6 +9,8 @@ using System;
 using H.Pipes;
 using System.Text.Json;
 using H.IpcGenerators;
+using System.Threading;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -23,19 +25,12 @@ namespace {@class.Namespace}
             Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
         }}
 
-{string.Concat(@class.Methods.Select(static method => $@"
+{@class.Methods.Select(static method => $@"
         public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
-            await WriteAsync(new {method.Name}Method(
-{string.Concat(method.Parameters.Select(static parameter => $@"
-                {parameter.Name},
-")).TrimEnd(',', ' ', '\n', '\r')}            
-            )
-            {{
-                Name = ""{method.Name}"",
-            }}).ConfigureAwait(false);
+            await WriteAsync(new {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => parameter.Name))})).ConfigureAwait(false);
         }}
-"))}
+").Inject()}
 
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
             where T : RpcMethod
@@ -51,25 +46,22 @@ namespace {@class.Namespace}
         }}
     }}
 
-{string.Concat(@class.Methods.Select(static method => $@"
+{@class.Methods.Select(static method => $@"
     public class {method.Name}Method : RpcMethod
     {{
-{string.Concat(method.Parameters.Select(static parameter => $@"
+{method.Parameters.Select(static parameter => $@"
         public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
-"))}
+").Inject()}
 
-        public {method.Name}Method(
-{string.Concat(method.Parameters.Select(static parameter => $@"
-            {parameter.Type} {parameter.Name},
-")).TrimEnd(',', ' ', '\n', '\r')}
-            )
+        public {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
-{string.Concat(method.Parameters.Select(static parameter => $@"
+            Name = ""{method.Name}"";
+{method.Parameters.Select(static parameter => $@"
             {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new ArgumentNullException(nameof({parameter.Name}));
-"))}
+").Inject()}
         }}
     }}
-"))}
+").Inject()}
 
 }}";
     }
@@ -98,18 +90,14 @@ namespace {@class.Namespace}
 
                 switch (method.Name)
                 {{
-{string.Concat(@class.Methods.Select(static method => $@"
+{@class.Methods.Select(static method => $@"
                     case nameof({method.Name}):
-                    {{
-                        var arguments = Deserialize<{method.Name}Method>(json);
-                        {method.Name}(
-{string.Concat(method.Parameters.Select(static parameter => $@"
-                            arguments.{parameter.Name.ToPropertyName()},
-")).TrimEnd(',', ' ', '\n', '\r')}
-                            );
-                        break;
-                    }}
-"))}
+                        {{
+                            var arguments = Deserialize<{method.Name}Method>(json);
+                            {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"arguments.{parameter.Name.ToPropertyName()}")).TrimEnd(',', ' ', '\n', '\r')});
+                            break;
+                        }}
+").Inject()}
                 }}
             }};
         }}
