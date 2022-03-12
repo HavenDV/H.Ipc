@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\libs\H.Ipc.Generator\H.Ipc.Generator.csproj" />
-    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.31" />
   </ItemGroup>
 
 </Project>
