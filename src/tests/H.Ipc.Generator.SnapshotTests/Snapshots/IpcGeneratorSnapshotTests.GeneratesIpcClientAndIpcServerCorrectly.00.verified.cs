@@ -36,7 +36,7 @@ namespace H.Ipc.Apps.Wpf
         }
 
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
-            where T : RpcMethod
+            where T : RpcRequest
         {
             if (Client == null)
             {
@@ -49,7 +49,7 @@ namespace H.Ipc.Apps.Wpf
         }
     }
 
-    public class ShowTrayIconMethod : RpcMethod
+    public class ShowTrayIconMethod : RunMethodRequest
     {
 
 
@@ -60,7 +60,7 @@ namespace H.Ipc.Apps.Wpf
         }
     }
 
-    public class HideTrayIconMethod : RpcMethod
+    public class HideTrayIconMethod : RunMethodRequest
     {
 
 
@@ -71,7 +71,7 @@ namespace H.Ipc.Apps.Wpf
         }
     }
 
-    public class SendTextMethod : RpcMethod
+    public class SendTextMethod : RunMethodRequest
     {
         public string Text { get; set; }
 

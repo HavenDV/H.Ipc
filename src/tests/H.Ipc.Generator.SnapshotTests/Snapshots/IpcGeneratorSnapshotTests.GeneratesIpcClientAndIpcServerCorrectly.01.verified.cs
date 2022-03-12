@@ -17,7 +17,7 @@ namespace H.Ipc.Apps.Wpf
             pipeServer.MessageReceived += (_, args) =>
             {
                 var json = args.Message ?? throw new InvalidOperationException("Message is null.");
-                var method = Deserialize<RpcMethod>(json);
+                var method = Deserialize<RunMethodRequest>(json);
 
                 switch (method.Name)
                 {

@@ -33,7 +33,7 @@ namespace {@class.Namespace}
 ").Inject()}
 
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
-            where T : RpcMethod
+            where T : RpcRequest
         {{
             if (Client == null)
             {{
@@ -47,7 +47,7 @@ namespace {@class.Namespace}
     }}
 
 {@class.Methods.Select(static method => $@"
-    public class {method.Name}Method : RpcMethod
+    public class {method.Name}Method : RunMethodRequest
     {{
 {method.Parameters.Select(static parameter => $@"
         public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
@@ -86,7 +86,7 @@ namespace {@class.Namespace}
             pipeServer.MessageReceived += (_, args) =>
             {{
                 var json = args.Message ?? throw new InvalidOperationException(""Message is null."");
-                var method = Deserialize<RpcMethod>(json);
+                var method = Deserialize<RunMethodRequest>(json);
 
                 switch (method.Name)
                 {{
