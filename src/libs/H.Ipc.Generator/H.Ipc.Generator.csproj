@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.23" />
-    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.23" />
+    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.31" />
+    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.31" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" PrivateAssets="all" />
   </ItemGroup>
 

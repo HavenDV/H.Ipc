@@ -7,6 +7,8 @@ internal class SourceGenerationHelper
         return @$"
 using System;
 using H.Pipes;
+using System.Text.Json;
+using H.IpcGenerators;
 
 #nullable enable
 
@@ -24,14 +26,24 @@ namespace {@class.Namespace}
 {string.Concat(@class.Methods.Select(static method => $@"
         public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static x => $"{x.Type} {x.Name}"))})
         {{
+            await WriteAsync(new RpcMethod
+            {{
+                Name = ""{method.Name}"",
+            }}).ConfigureAwait(false);
+        }}
+"))}
+
+        private async Task WriteAsync(RpcMethod method, CancellationToken cancellationToken = default)
+        {{
             if (Client == null)
             {{
                 return;
             }}
 
-            await Client.WriteAsync(""{method.Name}"").ConfigureAwait(false);
+            var json = JsonSerializer.Serialize(method);
+
+            await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }}
-"))}
     }}
 }}";
     }
@@ -41,6 +53,8 @@ namespace {@class.Namespace}
         return @$"
 using System;
 using H.Pipes;
+using System.Text.Json;
+using H.IpcGenerators;
 
 #nullable enable
 
@@ -53,8 +67,10 @@ namespace {@class.Namespace}
             pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
             pipeServer.MessageReceived += (_, args) =>
             {{
-                var methodName = args.Message;
-                switch (methodName)
+                var json = args.Message ?? throw new InvalidOperationException(""Message is null."");
+                var method = Deserialize<RpcMethod>(json);
+
+                switch (method.Name)
                 {{
 {string.Concat(@class.Methods.Select(static method => $@"
                     case nameof({method.Name}):
@@ -63,6 +79,15 @@ namespace {@class.Namespace}
 "))}
                 }}
             }};
+        }}
+
+        private static T Deserialize<T>(string json)
+        {{
+            return
+                JsonSerializer.Deserialize<T>(json) ??
+                throw new ArgumentException($@""Returned null when trying to deserialize to {{typeof(T)}}.
+    json:
+    {{json}}"");
         }}
     }}
 }}";
