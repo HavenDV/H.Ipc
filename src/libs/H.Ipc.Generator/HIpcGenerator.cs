@@ -78,13 +78,13 @@ public class HIpcGenerator : IIncrementalGenerator
                 .ToArray();
 
             var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
-            foreach(var @class in classes)
+            foreach (var @class in classes)
             {
-                var code = SourceGenerationHelper.GenerateClientImplementation(@class);
-
                 context.AddSource(
                     $"{@class.Name}.generated.cs",
-                    SourceText.From(code, Encoding.UTF8));
+                    SourceText.From(
+                        SourceGenerationHelper.GenerateClientImplementation(@class),
+                        Encoding.UTF8));
             }
         }
         catch (Exception exception)
@@ -112,11 +112,48 @@ public class HIpcGenerator : IIncrementalGenerator
             var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
             foreach (var @class in classes)
             {
-                var code = SourceGenerationHelper.GenerateServerImplementation(@class);
-
                 context.AddSource(
                     $"{@class.Name}.generated.cs",
-                    SourceText.From(code, Encoding.UTF8));
+                    SourceText.From(
+                        SourceGenerationHelper.GenerateServerImplementation(@class),
+                        Encoding.UTF8));
+            }
+        }
+        catch (Exception exception)
+        {
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "IPCG0001",
+                        "Exception: ",
+                        $"{exception}",
+                        "Usage",
+                        DiagnosticSeverity.Error,
+                        true),
+                    Location.None));
+        }
+
+        try
+        {
+            var distinctClassSyntaxes = classSyntaxes
+                .Where(static tuple =>
+                    tuple!.Value.FullName == IpcServerAttribute ||
+                    tuple!.Value.FullName == IpcClientAttribute)
+                .Select(static tuple => tuple!.Value.Class)
+                .Distinct()
+                .ToArray();
+
+            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
+            foreach (var @class in classes
+                .GroupBy(static @class => @class.InterfaceName)
+                .Distinct()
+                .Select(static group => group.First()))
+            {
+                context.AddSource(
+                    $"{@class.InterfaceName}_Requests.generated.cs",
+                    SourceText.From(
+                        SourceGenerationHelper.GenerateRequests(@class),
+                        Encoding.UTF8));
             }
         }
         catch (Exception exception)
@@ -168,7 +205,8 @@ public class HIpcGenerator : IIncrementalGenerator
             var fullClassName = classSymbol.ToString();
             var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
             var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
-            
+            var interfaceName = @interface.Name;
+
             // Get all the members in the enum
             //var enumMembers = classSymbol.GetMembers();
             //var members = new List<string>(enumMembers.Length);
@@ -182,7 +220,7 @@ public class HIpcGenerator : IIncrementalGenerator
             //    }
             //}
 
-            enumsToGenerate.Add(new ClassData(@namespace, className, methods));
+            enumsToGenerate.Add(new ClassData(@namespace, className, interfaceName, methods));
         }
 
         return enumsToGenerate;
@@ -194,4 +232,5 @@ public class HIpcGenerator : IIncrementalGenerator
 public readonly record struct ClassData(
     string Namespace,
     string Name,
+    string InterfaceName,
     IReadOnlyCollection<IMethodSymbol> Methods);

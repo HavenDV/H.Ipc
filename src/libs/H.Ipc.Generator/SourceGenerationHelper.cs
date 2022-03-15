@@ -45,24 +45,6 @@ namespace {@class.Namespace}
             await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }}
     }}
-
-{@class.Methods.Select(static method => $@"
-    public class {method.Name}Method : RunMethodRequest
-    {{
-{method.Parameters.Select(static parameter => $@"
-        public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
-").Inject()}
-
-        public {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
-        {{
-            Name = ""{method.Name}"";
-{method.Parameters.Select(static parameter => $@"
-            {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new ArgumentNullException(nameof({parameter.Name}));
-").Inject()}
-        }}
-    }}
-").Inject()}
-
 }}";
     }
 
@@ -115,6 +97,36 @@ namespace {@class.Namespace}
     {{json}}"");
         }}
     }}
+}}";
+    }
+
+    public static string GenerateRequests(ClassData @class)
+    {
+        return @$"
+using System;
+using H.IpcGenerators;
+
+#nullable enable
+
+namespace {@class.Namespace}
+{{
+{@class.Methods.Select(static method => $@"
+    public class {method.Name}Method : RunMethodRequest
+    {{
+{method.Parameters.Select(static parameter => $@"
+        public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
+").Inject()}
+
+        public {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
+        {{
+            Name = ""{method.Name}"";
+{method.Parameters.Select(static parameter => $@"
+            {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new ArgumentNullException(nameof({parameter.Name}));
+").Inject()}
+        }}
+    }}
+").Inject()}
+
 }}";
     }
 }

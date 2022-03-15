@@ -48,38 +48,4 @@ namespace H.Ipc.Apps.Wpf
             await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }
     }
-
-    public class ShowTrayIconMethod : RunMethodRequest
-    {
-
-
-        public ShowTrayIconMethod()
-        {
-            Name = "ShowTrayIcon";
-
-        }
-    }
-
-    public class HideTrayIconMethod : RunMethodRequest
-    {
-
-
-        public HideTrayIconMethod()
-        {
-            Name = "HideTrayIcon";
-
-        }
-    }
-
-    public class SendTextMethod : RunMethodRequest
-    {
-        public string Text { get; set; }
-
-        public SendTextMethod(string text)
-        {
-            Name = "SendText";
-            Text = text ?? throw new ArgumentNullException(nameof(text));
-        }
-    }
-
 }

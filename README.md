@@ -4,6 +4,8 @@
 [![NuGet](https://img.shields.io/nuget/dt/H.Ipc.Generator.svg?style=flat-square&label=H.Ipc.Generator)](https://www.nuget.org/packages/H.Ipc.Generator/)
 ```
 Install-Package H.Ipc.Generator
+Install-Package H.Ipc.Core
+Install-Package H.Pipes
 ```
 
 ### Usage
