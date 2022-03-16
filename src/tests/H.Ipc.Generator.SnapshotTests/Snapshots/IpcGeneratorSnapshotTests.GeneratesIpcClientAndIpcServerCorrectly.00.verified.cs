@@ -13,11 +13,11 @@ namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionServiceClient
     {
-        private PipeClient<string>? Client { get; set; }
+        private IPipeConnection<string>? Connection { get; set; }
 
-        public void Initialize(PipeClient<string> pipeClient)
+        public void Initialize(IPipeConnection<string> connection)
         {
-            Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
+            Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         }
 
         public async void ShowTrayIcon()
@@ -38,14 +38,14 @@ namespace H.Ipc.Apps.Wpf
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
             where T : RpcRequest
         {
-            if (Client == null)
+            if (Connection == null)
             {
                 return;
             }
 
             var json = JsonSerializer.Serialize(method);
 
-            await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
+            await Connection.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }
     }
 }

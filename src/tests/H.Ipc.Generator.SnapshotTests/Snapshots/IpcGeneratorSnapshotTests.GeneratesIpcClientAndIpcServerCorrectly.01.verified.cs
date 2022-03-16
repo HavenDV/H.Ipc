@@ -11,10 +11,10 @@ namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionService
     {
-        public void Initialize(PipeServer<string> pipeServer)
+        public void Initialize(IPipeConnection<string> connection)
         {
-            pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
-            pipeServer.MessageReceived += (_, args) =>
+            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            connection.MessageReceived += (_, args) =>
             {
                 var json = args.Message ?? throw new InvalidOperationException("Message is null.");
                 var request = Deserialize<RpcRequest>(json);

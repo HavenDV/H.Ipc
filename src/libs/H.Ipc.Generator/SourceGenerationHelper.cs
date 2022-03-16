@@ -18,11 +18,11 @@ namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        private PipeClient<string>? Client {{ get; set; }}
+        private IPipeConnection<string>? Connection {{ get; set; }}
 
-        public void Initialize(PipeClient<string> pipeClient)
+        public void Initialize(IPipeConnection<string> connection)
         {{
-            Client = pipeClient ?? throw new ArgumentNullException(nameof(pipeClient));
+            Connection = connection ?? throw new ArgumentNullException(nameof(connection));
         }}
 
 {@class.Methods.Select(static method => $@"
@@ -35,14 +35,14 @@ namespace {@class.Namespace}
         private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
             where T : RpcRequest
         {{
-            if (Client == null)
+            if (Connection == null)
             {{
                 return;
             }}
 
             var json = JsonSerializer.Serialize(method);
 
-            await Client.WriteAsync(json, cancellationToken).ConfigureAwait(false);
+            await Connection.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }}
     }}
 }}";
@@ -62,10 +62,10 @@ namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        public void Initialize(PipeServer<string> pipeServer)
+        public void Initialize(IPipeConnection<string> connection)
         {{
-            pipeServer = pipeServer ?? throw new ArgumentNullException(nameof(pipeServer));
-            pipeServer.MessageReceived += (_, args) =>
+            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            connection.MessageReceived += (_, args) =>
             {{
                 var json = args.Message ?? throw new InvalidOperationException(""Message is null."");
                 var request = Deserialize<RpcRequest>(json);
