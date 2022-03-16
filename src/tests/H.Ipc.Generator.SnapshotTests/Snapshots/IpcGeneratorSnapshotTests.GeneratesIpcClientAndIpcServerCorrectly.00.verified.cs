@@ -1,14 +1,29 @@
 ﻿//HintName: ActionServiceClient.generated.cs
 
-using System.Threading.Tasks;
-
 #nullable enable
 
 namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionServiceClient
     {
+        #region Properties
+
         private global::H.Pipes.IPipeConnection<string>? Connection { get; set; }
+
+        #endregion
+
+        #region Events
+
+
+        public event global::System.EventHandler<global::System.Exception>? ExceptionOccurred;
+
+        private void OnExceptionOccurred(global::System.Exception exception)
+        {
+            ExceptionOccurred?.Invoke(this, exception);
+        }
+
+
+        #endregion
 
         public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {
@@ -17,27 +32,48 @@ namespace H.Ipc.Apps.Wpf
 
         public async void ShowTrayIcon()
         {
-            await WriteAsync(new ShowTrayIconMethod()).ConfigureAwait(false);
+            try
+            {
+                await WriteAsync(new ShowTrayIconMethod()).ConfigureAwait(false);
+            }
+            catch (global::System.Exception exception)
+            {
+                OnExceptionOccurred(exception);
+            }
         }
 
         public async void HideTrayIcon()
         {
-            await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
+            try
+            {
+                await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
+            }
+            catch (global::System.Exception exception)
+            {
+                OnExceptionOccurred(exception);
+            }
         }
 
         public async void SendText(string text)
         {
-            await WriteAsync(new SendTextMethod(text)).ConfigureAwait(false);
+            try
+            {
+                await WriteAsync(new SendTextMethod(text)).ConfigureAwait(false);
+            }
+            catch (global::System.Exception exception)
+            {
+                OnExceptionOccurred(exception);
+            }
         }
 
-        private async Task WriteAsync<T>(
+        private async global::System.Threading.Tasks.Task WriteAsync<T>(
             T method,
             global::System.Threading.CancellationToken cancellationToken = default)
             where T : global::H.IpcGenerators.RpcRequest
         {
             if (Connection == null)
             {
-                return;
+                throw new global::System.InvalidOperationException("You need to call Initialize() first.");
             }
 
             var json = global::System.Text.Json.JsonSerializer.Serialize(method);
