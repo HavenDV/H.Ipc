@@ -1,13 +1,10 @@
 ﻿//HintName: IActionService_Requests.generated.cs
 
-using System;
-using H.IpcGenerators;
-
 #nullable enable
 
 namespace H.Ipc.Apps.Wpf
 {
-    public class ShowTrayIconMethod : RunMethodRequest
+    public class ShowTrayIconMethod : global::H.IpcGenerators.RunMethodRequest
     {
 
 
@@ -18,7 +15,7 @@ namespace H.Ipc.Apps.Wpf
         }
     }
 
-    public class HideTrayIconMethod : RunMethodRequest
+    public class HideTrayIconMethod : global::H.IpcGenerators.RunMethodRequest
     {
 
 
@@ -29,14 +26,14 @@ namespace H.Ipc.Apps.Wpf
         }
     }
 
-    public class SendTextMethod : RunMethodRequest
+    public class SendTextMethod : global::H.IpcGenerators.RunMethodRequest
     {
         public string Text { get; set; }
 
         public SendTextMethod(string text)
         {
             Name = "SendText";
-            Text = text ?? throw new ArgumentNullException(nameof(text));
+            Text = text ?? throw new global::System.ArgumentNullException(nameof(text));
         }
     }
 

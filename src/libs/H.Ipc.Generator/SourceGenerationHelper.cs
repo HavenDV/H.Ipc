@@ -5,11 +5,6 @@ internal class SourceGenerationHelper
     public static string GenerateClientImplementation(ClassData @class)
     {
         return @$"
-using System;
-using H.Pipes;
-using System.Text.Json;
-using H.IpcGenerators;
-using System.Threading;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -18,11 +13,11 @@ namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        private IPipeConnection<string>? Connection {{ get; set; }}
+        private global::H.Pipes.IPipeConnection<string>? Connection {{ get; set; }}
 
-        public void Initialize(IPipeConnection<string> connection)
+        public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {{
-            Connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            Connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
         }}
 
 {@class.Methods.Select(static method => $@"
@@ -32,15 +27,17 @@ namespace {@class.Namespace}
         }}
 ").Inject()}
 
-        private async Task WriteAsync<T>(T method, CancellationToken cancellationToken = default)
-            where T : RpcRequest
+        private async Task WriteAsync<T>(
+            T method,
+            global::System.Threading.CancellationToken cancellationToken = default)
+            where T : global::H.IpcGenerators.RpcRequest
         {{
             if (Connection == null)
             {{
                 return;
             }}
 
-            var json = JsonSerializer.Serialize(method);
+            var json = global::System.Text.Json.JsonSerializer.Serialize(method);
 
             await Connection.WriteAsync(json, cancellationToken).ConfigureAwait(false);
         }}
@@ -51,28 +48,23 @@ namespace {@class.Namespace}
     public static string GenerateServerImplementation(ClassData @class)
     {
         return @$"
-using System;
-using H.Pipes;
-using System.Text.Json;
-using H.IpcGenerators;
-
 #nullable enable
 
 namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
     {{
-        public void Initialize(IPipeConnection<string> connection)
+        public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {{
-            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
             connection.MessageReceived += (_, args) =>
             {{
-                var json = args.Message ?? throw new InvalidOperationException(""Message is null."");
-                var request = Deserialize<RpcRequest>(json);
+                var json = args.Message ?? throw new global::System.InvalidOperationException(""Message is null."");
+                var request = Deserialize<global::H.IpcGenerators.RpcRequest>(json);
 
-                if (request.Type == RpcRequestType.RunMethod)
+                if (request.Type == global::H.IpcGenerators.RpcRequestType.RunMethod)
                 {{
-                    var method = Deserialize<RunMethodRequest>(json);
+                    var method = Deserialize<global::H.IpcGenerators.RunMethodRequest>(json);
                     switch (method.Name)
                     {{
 {@class.Methods.Select(static method => $@"
@@ -91,8 +83,8 @@ namespace {@class.Namespace}
         private static T Deserialize<T>(string json)
         {{
             return
-                JsonSerializer.Deserialize<T>(json) ??
-                throw new ArgumentException($@""Returned null when trying to deserialize to {{typeof(T)}}.
+                global::System.Text.Json.JsonSerializer.Deserialize<T>(json) ??
+                throw new global::System.ArgumentException($@""Returned null when trying to deserialize to {{typeof(T)}}.
     json:
     {{json}}"");
         }}
@@ -103,15 +95,12 @@ namespace {@class.Namespace}
     public static string GenerateRequests(ClassData @class)
     {
         return @$"
-using System;
-using H.IpcGenerators;
-
 #nullable enable
 
 namespace {@class.Namespace}
 {{
 {@class.Methods.Select(static method => $@"
-    public class {method.Name}Method : RunMethodRequest
+    public class {method.Name}Method : global::H.IpcGenerators.RunMethodRequest
     {{
 {method.Parameters.Select(static parameter => $@"
         public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
@@ -121,7 +110,7 @@ namespace {@class.Namespace}
         {{
             Name = ""{method.Name}"";
 {method.Parameters.Select(static parameter => $@"
-            {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new ArgumentNullException(nameof({parameter.Name}));
+            {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new global::System.ArgumentNullException(nameof({parameter.Name}));
 ").Inject()}
         }}
     }}

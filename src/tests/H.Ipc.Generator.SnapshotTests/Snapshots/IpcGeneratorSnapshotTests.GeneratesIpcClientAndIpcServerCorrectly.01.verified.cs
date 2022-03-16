@@ -1,27 +1,22 @@
 ﻿//HintName: ActionService.generated.cs
 
-using System;
-using H.Pipes;
-using System.Text.Json;
-using H.IpcGenerators;
-
 #nullable enable
 
 namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionService
     {
-        public void Initialize(IPipeConnection<string> connection)
+        public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {
-            connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
             connection.MessageReceived += (_, args) =>
             {
-                var json = args.Message ?? throw new InvalidOperationException("Message is null.");
-                var request = Deserialize<RpcRequest>(json);
+                var json = args.Message ?? throw new global::System.InvalidOperationException("Message is null.");
+                var request = Deserialize<global::H.IpcGenerators.RpcRequest>(json);
 
-                if (request.Type == RpcRequestType.RunMethod)
+                if (request.Type == global::H.IpcGenerators.RpcRequestType.RunMethod)
                 {
-                    var method = Deserialize<RunMethodRequest>(json);
+                    var method = Deserialize<global::H.IpcGenerators.RunMethodRequest>(json);
                     switch (method.Name)
                     {
                         case nameof(ShowTrayIcon):
@@ -52,8 +47,8 @@ namespace H.Ipc.Apps.Wpf
         private static T Deserialize<T>(string json)
         {
             return
-                JsonSerializer.Deserialize<T>(json) ??
-                throw new ArgumentException($@"Returned null when trying to deserialize to {typeof(T)}.
+                global::System.Text.Json.JsonSerializer.Deserialize<T>(json) ??
+                throw new global::System.ArgumentException($@"Returned null when trying to deserialize to {typeof(T)}.
     json:
     {json}");
         }
