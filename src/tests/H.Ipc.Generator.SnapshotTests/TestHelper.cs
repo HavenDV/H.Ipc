@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace H.Ipc.Generator.IntegrationTests;
+namespace H.Generators.IntegrationTests;
 
 public static class TestHelper
 {

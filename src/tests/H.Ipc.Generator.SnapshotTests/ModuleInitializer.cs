@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace H.Ipc.Generator.IntegrationTests;
+namespace H.Generators.IntegrationTests;
 
 public static class ModuleInitializer
 {

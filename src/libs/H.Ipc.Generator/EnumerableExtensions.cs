@@ -1,4 +1,4 @@
-﻿namespace H.Ipc.Generator;
+﻿namespace H.Generators;
 
 public static class EnumerableExtensions
 {

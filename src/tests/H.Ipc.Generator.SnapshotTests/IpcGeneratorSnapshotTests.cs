@@ -1,4 +1,4 @@
-﻿namespace H.Ipc.Generator.IntegrationTests;
+﻿namespace H.Generators.IntegrationTests;
 
 [TestClass]
 public class IpcGeneratorSnapshotTests : VerifyBase

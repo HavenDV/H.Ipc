@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-namespace H.Ipc.Generator;
+namespace H.Generators;
 
 [Generator]
 public class HIpcGenerator : IIncrementalGenerator
