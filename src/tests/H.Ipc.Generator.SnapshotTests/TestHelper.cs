@@ -44,12 +44,13 @@ namespace MyCode
             out _);
         var diagnostics = compilation.GetDiagnostics();
 
-        await verifier
-            .Verify(diagnostics)
-            .UseDirectory("Snapshots")
-            .UseTextForParameters("Diagnostics");
-        await verifier
-            .Verify(driver)
-            .UseDirectory("Snapshots");
+        await Task.WhenAll(
+            verifier
+                .Verify(diagnostics)
+                .UseDirectory("Snapshots")
+                .UseTextForParameters("Diagnostics"),
+            verifier
+                .Verify(driver)
+                .UseDirectory("Snapshots"));
     }
 }
