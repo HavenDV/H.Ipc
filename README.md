@@ -1,4 +1,6 @@
-# H.Ipc.Generator
+# H.Ipc
+This generator allows you to generate boilerplate code for [H.Pipes](https://github.com/HavenDV/H.Pipes) based on the interface you specify.
+Generation example: https://github.com/HavenDV/H.ProxyFactory/issues/7#issuecomment-1072287342
 
 ### Nuget
 [![NuGet](https://img.shields.io/nuget/dt/H.Ipc.Generator.svg?style=flat-square&label=H.Ipc.Generator)](https://www.nuget.org/packages/H.Ipc.Generator/)
