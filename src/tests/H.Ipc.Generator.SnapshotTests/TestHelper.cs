@@ -5,25 +5,17 @@ namespace H.Generators.IntegrationTests;
 
 public static class TestHelper
 {
-    public static async Task CheckSource(this VerifyBase verifier, string source)
+    public static async Task CheckSourceAsync(
+        this VerifyBase verifier,
+        string source,
+        CancellationToken cancellationToken = default)
     {
         var dotNetFolder = Path.GetDirectoryName(typeof(object).Assembly.Location) ?? string.Empty;
         var compilation = (Compilation)CSharpCompilation.Create(
             assemblyName: "Tests",
             syntaxTrees: new[]
             {
-                CSharpSyntaxTree.ParseText(source),
-                CSharpSyntaxTree.ParseText(@"
-namespace MyCode
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-        }
-    }
-}
-"),
+                CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken),
             },
             references: new[]
             {
@@ -33,16 +25,12 @@ namespace MyCode
                 MetadataReference.CreateFromFile(typeof(H.Pipes.PipeClient<>).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(System.Text.Json.JsonSerializer).Assembly.Location),
                 MetadataReference.CreateFromFile(typeof(H.IpcGenerators.IpcClientAttribute).Assembly.Location),
-            });
-        var generator = new HIpcGenerator();
-        var driver = (GeneratorDriver)CSharpGeneratorDriver.Create(generator);
-        driver = driver.RunGenerators(compilation);
-        
-        driver = driver.RunGeneratorsAndUpdateCompilation(
-            compilation,
-            out compilation,
-            out _);
-        var diagnostics = compilation.GetDiagnostics();
+            },
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+        var driver = CSharpGeneratorDriver
+            .Create(new HIpcGenerator())
+            .RunGeneratorsAndUpdateCompilation(compilation, out compilation, out _, cancellationToken);
+        var diagnostics = compilation.GetDiagnostics(cancellationToken);
 
         await Task.WhenAll(
             verifier

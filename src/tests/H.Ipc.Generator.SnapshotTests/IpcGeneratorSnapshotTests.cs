@@ -6,7 +6,7 @@ public class IpcGeneratorSnapshotTests : VerifyBase
     [TestMethod]
     public Task GeneratesIpcClientAndIpcServerCorrectly()
     {
-        return this.CheckSource(@"
+        return this.CheckSourceAsync(@"
 namespace H.Ipc.Apps.Wpf;
 
 public interface IActionService
