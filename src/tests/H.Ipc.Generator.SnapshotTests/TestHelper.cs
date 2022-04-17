@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Testing;
 
 namespace H.Generators.IntegrationTests;
 
@@ -10,22 +12,19 @@ public static class TestHelper
         string source,
         CancellationToken cancellationToken = default)
     {
-        var dotNetFolder = Path.GetDirectoryName(typeof(object).Assembly.Location) ?? string.Empty;
+        var referenceAssemblies = ReferenceAssemblies.Net.Net60
+            .WithPackages(ImmutableArray.Create(new PackageIdentity("H.Pipes.AccessControl", "2.0.31")));
+        var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
+        references = references
+            .Add(MetadataReference.CreateFromFile(typeof(H.IpcGenerators.IpcClientAttribute).Assembly.Location));
+
         var compilation = (Compilation)CSharpCompilation.Create(
             assemblyName: "Tests",
             syntaxTrees: new[]
             {
                 CSharpSyntaxTree.ParseText(source, cancellationToken: cancellationToken),
             },
-            references: new[]
-            {
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(Path.Combine(dotNetFolder, "System.Runtime.dll")),
-                MetadataReference.CreateFromFile(Path.Combine(dotNetFolder, "netstandard.dll")),
-                MetadataReference.CreateFromFile(typeof(H.Pipes.PipeClient<>).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(System.Text.Json.JsonSerializer).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(H.IpcGenerators.IpcClientAttribute).Assembly.Location),
-            },
+            references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
         var driver = CSharpGeneratorDriver
             .Create(new HIpcGenerator())
