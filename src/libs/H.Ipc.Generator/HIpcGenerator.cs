@@ -1,8 +1,7 @@
 ﻿using System.Collections.Immutable;
-using System.Text;
+using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 
 namespace H.Generators;
 
@@ -10,6 +9,9 @@ namespace H.Generators;
 public class HIpcGenerator : IIncrementalGenerator
 {
     #region Constants
+
+    public const string Name = nameof(HIpcGenerator);
+    public const string Id = "IPCG";
 
     private const string IpcClientAttribute = "H.IpcGenerators.IpcClientAttribute";
     private const string IpcServerAttribute = "H.IpcGenerators.IpcServerAttribute";
@@ -56,7 +58,7 @@ public class HIpcGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(
             compilationAndEnums,
-            static (context, source) => Execute(source.Left, source.Right!, context));
+            static (context, source) => Execute(source.Left, source.Right, context));
     }
 
     private static void Execute(
@@ -80,25 +82,17 @@ public class HIpcGenerator : IIncrementalGenerator
             var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
             foreach (var @class in classes)
             {
-                context.AddSource(
-                    $"{@class.Name}.generated.cs",
-                    SourceText.From(
-                        SourceGenerationHelper.GenerateClientImplementation(@class),
-                        Encoding.UTF8));
+                context.AddTextSource(
+                    hintName: $"{@class.Name}.generated.cs",
+                    text: SourceGenerationHelper.GenerateClientImplementation(@class));
             }
         }
         catch (Exception exception)
         {
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "IPCG0001",
-                        "Exception: ",
-                        $"{exception}",
-                        "Usage",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+            context.ReportException(
+                id: "001",
+                exception: exception,
+                prefix: Id);
         }
 
         try
@@ -112,25 +106,17 @@ public class HIpcGenerator : IIncrementalGenerator
             var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
             foreach (var @class in classes)
             {
-                context.AddSource(
-                    $"{@class.Name}.generated.cs",
-                    SourceText.From(
-                        SourceGenerationHelper.GenerateServerImplementation(@class),
-                        Encoding.UTF8));
+                context.AddTextSource(
+                    hintName: $"{@class.Name}.generated.cs",
+                    text: SourceGenerationHelper.GenerateServerImplementation(@class));
             }
         }
         catch (Exception exception)
         {
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "IPCG0001",
-                        "Exception: ",
-                        $"{exception}",
-                        "Usage",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+            context.ReportException(
+                id: "001",
+                exception: exception,
+                prefix: Id);
         }
 
         try
@@ -138,7 +124,7 @@ public class HIpcGenerator : IIncrementalGenerator
             var distinctClassSyntaxes = classSyntaxes
                 .Where(static tuple =>
                     tuple!.Value.FullName == IpcServerAttribute ||
-                    tuple!.Value.FullName == IpcClientAttribute)
+                    tuple.Value.FullName == IpcClientAttribute)
                 .Select(static tuple => tuple!.Value.Class)
                 .Distinct()
                 .ToArray();
@@ -149,25 +135,17 @@ public class HIpcGenerator : IIncrementalGenerator
                 .Distinct()
                 .Select(static group => group.First()))
             {
-                context.AddSource(
-                    $"{@class.InterfaceName}_Requests.generated.cs",
-                    SourceText.From(
-                        SourceGenerationHelper.GenerateRequests(@class),
-                        Encoding.UTF8));
+                context.AddTextSource(
+                    hintName: $"{@class.InterfaceName}_Requests.generated.cs",
+                    text: SourceGenerationHelper.GenerateRequests(@class));
             }
         }
         catch (Exception exception)
         {
-            context.ReportDiagnostic(
-                Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "IPCG0001",
-                        "Exception: ",
-                        $"{exception}",
-                        "Usage",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None));
+            context.ReportException(
+                id: "001",
+                exception: exception,
+                prefix: Id);
         }
     }
 
