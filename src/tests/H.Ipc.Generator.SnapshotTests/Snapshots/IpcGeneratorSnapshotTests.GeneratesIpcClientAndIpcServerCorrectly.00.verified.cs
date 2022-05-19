@@ -1,17 +1,11 @@
-﻿//HintName: ActionServiceClient.generated.cs
+﻿//HintName: ActionService.generated.cs
 
 #nullable enable
 
 namespace H.Ipc.Apps.Wpf
 {
-    public partial class ActionServiceClient
+    public partial class ActionService
     {
-        #region Properties
-
-        private global::H.Pipes.IPipeConnection<string>? Connection { get; set; }
-
-        #endregion
-
         #region Events
 
 
@@ -27,58 +21,56 @@ namespace H.Ipc.Apps.Wpf
 
         public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {
-            Connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
+            connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
+            connection.MessageReceived += (_, args) =>
+            {
+                try
+                {
+                    var json = args.Message ?? throw new global::System.InvalidOperationException("Message is null.");
+                    var request = Deserialize<global::H.IpcGenerators.RpcRequest>(json);
+
+                    if (request.Type == global::H.IpcGenerators.RpcRequestType.RunMethod)
+                    {
+                        var method = Deserialize<global::H.IpcGenerators.RunMethodRequest>(json);
+                        switch (method.Name)
+                        {
+                            case nameof(ShowTrayIcon):
+                                {
+                                    var arguments = Deserialize<ShowTrayIconMethod>(json);
+                                    ShowTrayIcon();
+                                    break;
+                                }
+
+                            case nameof(HideTrayIcon):
+                                {
+                                    var arguments = Deserialize<HideTrayIconMethod>(json);
+                                    HideTrayIcon();
+                                    break;
+                                }
+
+                            case nameof(SendText):
+                                {
+                                    var arguments = Deserialize<SendTextMethod>(json);
+                                    SendText(arguments.Text);
+                                    break;
+                                }
+                        }
+                    }
+                }
+                catch (global::System.Exception exception)
+                {
+                    OnExceptionOccurred(exception);
+                }
+            };
         }
 
-        public async void ShowTrayIcon()
+        private static T Deserialize<T>(string json)
         {
-            try
-            {
-                await WriteAsync(new ShowTrayIconMethod()).ConfigureAwait(false);
-            }
-            catch (global::System.Exception exception)
-            {
-                OnExceptionOccurred(exception);
-            }
-        }
-
-        public async void HideTrayIcon()
-        {
-            try
-            {
-                await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
-            }
-            catch (global::System.Exception exception)
-            {
-                OnExceptionOccurred(exception);
-            }
-        }
-
-        public async void SendText(string text)
-        {
-            try
-            {
-                await WriteAsync(new SendTextMethod(text)).ConfigureAwait(false);
-            }
-            catch (global::System.Exception exception)
-            {
-                OnExceptionOccurred(exception);
-            }
-        }
-
-        private async global::System.Threading.Tasks.Task WriteAsync<T>(
-            T method,
-            global::System.Threading.CancellationToken cancellationToken = default)
-            where T : global::H.IpcGenerators.RpcRequest
-        {
-            if (Connection == null)
-            {
-                throw new global::System.InvalidOperationException("You need to call Initialize() first.");
-            }
-
-            var json = global::System.Text.Json.JsonSerializer.Serialize(method);
-
-            await Connection.WriteAsync(json, cancellationToken).ConfigureAwait(false);
+            return
+                global::System.Text.Json.JsonSerializer.Deserialize<T>(json) ??
+                throw new global::System.ArgumentException($@"Returned null when trying to deserialize to {typeof(T)}.
+    json:
+    {json}");
         }
     }
 }
