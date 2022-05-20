@@ -11,12 +11,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <IncludeSymbols>false</IncludeSymbols>
     <Description>C# Source Generator for Inter-Process Communication.</Description>
-    <PackageTags>ipc, generator, source generator, csharp 9</PackageTags>
+    <PackageTags>ipc;generator;source generator;pipes</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="true" Link="Dependencies/%(FileName).dll" />
-    <None Include="H.Ipc.Generator.props" Pack="true" PackagePath="build" />
+    <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
   </ItemGroup>
 
   <ItemGroup>
