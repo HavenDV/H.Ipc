@@ -62,5 +62,13 @@ await client.ConnectAsync();
 client.ShowTrayIcon();
 ```
 
+### Notes
+The generated code currently requires C# version 8 and above. You can enable this using the following code in your .csproj file:
+```xml
+<PropertyGroup>
+  <LangVersion>preview</LangVersion> <!-- or just 8.0 -->
+</PropertyGroup>
+```
+
 ### Contacts
 * [mail](mailto:havendv@gmail.com)
