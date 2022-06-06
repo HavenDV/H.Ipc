@@ -155,12 +155,6 @@ public class HIpcGenerator : IIncrementalGenerator
         CancellationToken cancellationToken)
     {
         var enumsToGenerate = new List<ClassData>();
-        var enumAttribute = compilation.GetTypeByMetadataName(IpcClientAttribute);
-        if (enumAttribute == null)
-        {
-            return enumsToGenerate;
-        }
-
         foreach (var classDeclarationSyntax in enums)
         {
             cancellationToken.ThrowIfCancellationRequested();
