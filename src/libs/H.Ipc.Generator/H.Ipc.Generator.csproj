@@ -24,10 +24,6 @@
     <PackageReference Include="H.Pipes.AccessControl" Version="2.0.38" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.2.0" PrivateAssets="all" />
     <PackageReference Include="H.Generators.Extensions" Version="1.2.0" PrivateAssets="all" />
-    <PackageReference Include="ConventionalCommitsGitInfo" Version="0.3.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
