@@ -155,9 +155,9 @@ namespace {@class.Namespace}
         public event global::System.EventHandler<global::System.Exception>? ExceptionOccurred;
 
         private void OnExceptionOccurred(global::System.Exception exception)
-        {{
+        {
             ExceptionOccurred?.Invoke(this, exception);
-        }}
+        }
 ";
     }
 }
