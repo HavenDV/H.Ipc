@@ -1,4 +1,6 @@
-﻿namespace H.Generators;
+﻿using H.Generators.Extensions;
+
+namespace H.Generators;
 
 internal class SourceGenerationHelper
 {
@@ -149,7 +151,7 @@ namespace {@class.Namespace}
 
     public static string GenerateExceptionOccurredEvent()
     {
-        return @$"
+        return @"
         public event global::System.EventHandler<global::System.Exception>? ExceptionOccurred;
 
         private void OnExceptionOccurred(global::System.Exception exception)
