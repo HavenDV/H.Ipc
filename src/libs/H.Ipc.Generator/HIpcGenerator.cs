@@ -172,25 +172,10 @@ public class HIpcGenerator : IIncrementalGenerator
                 .OfType<IMethodSymbol>()
                 .ToArray();
             
-            // Get the full type name of the enum e.g. Colour, 
-            // or OuterClass<T>.Colour if it was nested in a generic type (for example)
             var fullClassName = classSymbol.ToString();
             var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
             var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
             var interfaceName = @interface.Name;
-
-            // Get all the members in the enum
-            //var enumMembers = classSymbol.GetMembers();
-            //var members = new List<string>(enumMembers.Length);
-
-            //// Get all the fields from the enum, and add their name to the list
-            //foreach (ISymbol member in enumMembers)
-            //{
-            //    if (member is IFieldSymbol field && field.ConstantValue is not null)
-            //    {
-            //        members.Add(member.Name);
-            //    }
-            //}
 
             enumsToGenerate.Add(new ClassData(@namespace, className, interfaceName, methods));
         }
