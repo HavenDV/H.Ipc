@@ -9,4 +9,8 @@
     <PackageTags>ipc, generator, source generator, csharp 9</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup Label="Usings">
+    <Using Include="System.Diagnostics" />
+  </ItemGroup>
+
 </Project>

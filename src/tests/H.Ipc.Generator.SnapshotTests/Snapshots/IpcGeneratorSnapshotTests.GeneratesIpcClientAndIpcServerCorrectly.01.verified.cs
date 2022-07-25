@@ -14,14 +14,12 @@ namespace H.Ipc.Apps.Wpf
 
         #region Events
 
-
         public event global::System.EventHandler<global::System.Exception>? ExceptionOccurred;
 
         private void OnExceptionOccurred(global::System.Exception exception)
         {
             ExceptionOccurred?.Invoke(this, exception);
         }
-
 
         #endregion
 

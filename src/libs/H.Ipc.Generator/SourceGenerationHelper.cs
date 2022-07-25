@@ -135,29 +135,28 @@ namespace {@class.Namespace}
 {method.Parameters.Select(static parameter => $@"
         public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
 ").Inject()}
-
+ 
         public {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
             Name = ""{method.Name}"";
-{method.Parameters.Select(static parameter => $@"
+{method.Parameters.Select(static parameter => $@" 
             {parameter.Name.ToPropertyName()} = {parameter.Name} ?? throw new global::System.ArgumentNullException(nameof({parameter.Name}));
-").Inject()}
+ ").Inject()}
         }}
     }}
 ").Inject()}
-
-}}";
+}}".RemoveBlankLinesWhereOnlyWhitespaces();
     }
 
     public static string GenerateExceptionOccurredEvent()
     {
-        return @"
+        return @" 
         public event global::System.EventHandler<global::System.Exception>? ExceptionOccurred;
 
         private void OnExceptionOccurred(global::System.Exception exception)
         {
             ExceptionOccurred?.Invoke(this, exception);
         }
-";
+ ".RemoveBlankLinesWhereOnlyWhitespaces();
     }
 }

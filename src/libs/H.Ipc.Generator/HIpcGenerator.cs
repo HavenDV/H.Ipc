@@ -2,6 +2,8 @@
 using H.Generators.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using IpcClientAttribute = H.IpcGenerators.IpcClientAttribute;
+using IpcServerAttribute = H.IpcGenerators.IpcServerAttribute;
 
 namespace H.Generators;
 
@@ -13,8 +15,8 @@ public class HIpcGenerator : IIncrementalGenerator
     public const string Name = nameof(HIpcGenerator);
     public const string Id = "IPCG";
 
-    private const string IpcClientAttribute = "H.IpcGenerators.IpcClientAttribute";
-    private const string IpcServerAttribute = "H.IpcGenerators.IpcServerAttribute";
+    private static string IpcClientAttributeFullName => typeof(IpcClientAttribute).FullName;
+    private static string IpcServerAttributeFullName => typeof(IpcServerAttribute).FullName;
 
     #endregion
 
@@ -35,8 +37,8 @@ public class HIpcGenerator : IIncrementalGenerator
 
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                if (fullName == IpcClientAttribute ||
-                    fullName == IpcServerAttribute)
+                if (fullName == IpcClientAttributeFullName ||
+                    fullName == IpcServerAttributeFullName)
                 {
                     return (classDeclarationSyntax, fullName);
                 }
@@ -74,7 +76,7 @@ public class HIpcGenerator : IIncrementalGenerator
         try
         {
             var distinctClassSyntaxes = classSyntaxes
-                .Where(static tuple => tuple!.Value.FullName == IpcClientAttribute)
+                .Where(static tuple => tuple!.Value.FullName == IpcClientAttributeFullName)
                 .Select(static tuple => tuple!.Value.Class)
                 .Distinct()
                 .ToArray();
@@ -98,7 +100,7 @@ public class HIpcGenerator : IIncrementalGenerator
         try
         {
             var distinctClassSyntaxes = classSyntaxes
-                .Where(static tuple => tuple!.Value.FullName == IpcServerAttribute)
+                .Where(static tuple => tuple!.Value.FullName == IpcServerAttributeFullName)
                 .Select(static tuple => tuple!.Value.Class)
                 .Distinct()
                 .ToArray();
@@ -123,8 +125,8 @@ public class HIpcGenerator : IIncrementalGenerator
         {
             var distinctClassSyntaxes = classSyntaxes
                 .Where(static tuple =>
-                    tuple!.Value.FullName == IpcServerAttribute ||
-                    tuple.Value.FullName == IpcClientAttribute)
+                    tuple!.Value.FullName == IpcServerAttributeFullName ||
+                    tuple.Value.FullName == IpcClientAttributeFullName)
                 .Select(static tuple => tuple!.Value.Class)
                 .Distinct()
                 .ToArray();

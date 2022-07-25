@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\libs\H.Ipc.Core\H.Ipc.Core.csproj" />
     <ProjectReference Include="..\..\libs\H.Ipc.Generator\H.Ipc.Generator.csproj" />
   </ItemGroup>
 
