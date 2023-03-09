@@ -13,7 +13,7 @@ public static class TestHelper
         CancellationToken cancellationToken = default)
     {
         var referenceAssemblies = ReferenceAssemblies.Net.Net60
-            .WithPackages(ImmutableArray.Create(new PackageIdentity("H.Pipes.AccessControl", "2.0.31")));
+            .WithPackages(ImmutableArray.Create(new PackageIdentity("H.Pipes.AccessControl", "2.0.47")));
         var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
         references = references
             .Add(MetadataReference.CreateFromFile(typeof(H.IpcGenerators.IpcClientAttribute).Assembly.Location));

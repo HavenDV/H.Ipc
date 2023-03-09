@@ -1,9 +1,5 @@
-﻿using System.Collections.Immutable;
-using H.Generators.Extensions;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using IpcClientAttribute = H.IpcGenerators.IpcClientAttribute;
-using IpcServerAttribute = H.IpcGenerators.IpcServerAttribute;
 
 namespace H.Generators;
 
@@ -15,181 +11,88 @@ public class HIpcGenerator : IIncrementalGenerator
     public const string Name = nameof(HIpcGenerator);
     public const string Id = "IPCG";
 
-    private static string IpcClientAttributeFullName => typeof(IpcClientAttribute).FullName;
-    private static string IpcServerAttributeFullName => typeof(IpcServerAttribute).FullName;
-
     #endregion
 
     #region Methods
 
-    private static (ClassDeclarationSyntax Class, string FullName)? GetSemanticTargetForGeneration(GeneratorSyntaxContext context)
-    {
-        var classDeclarationSyntax = (ClassDeclarationSyntax)context.Node;
-
-        foreach (var attributeListSyntax in classDeclarationSyntax.AttributeLists)
-        {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                {
-                    continue;
-                }
-
-                var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                if (fullName == IpcClientAttributeFullName ||
-                    fullName == IpcServerAttributeFullName)
-                {
-                    return (classDeclarationSyntax, fullName);
-                }
-            }
-        }
-
-        return null;
-    }
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var enumDeclarations = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                predicate: static (node, _) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
-                transform: static (context, _) => GetSemanticTargetForGeneration(context))
-            .Where(static syntax => syntax is not null);
-
-        var compilationAndEnums = context.CompilationProvider.Combine(enumDeclarations.Collect());
-
-        context.RegisterSourceOutput(
-            compilationAndEnums,
-            static (context, source) => Execute(source.Left, source.Right, context));
+        context.SyntaxProvider
+            .ForAttributeWithMetadataName("H.IpcGenerators.IpcClientAttribute")
+            .SelectManyAllAttributesOfCurrentClassSyntax()
+            .SelectAndReportExceptions(PrepareData, context, Id)
+            .SelectAndReportExceptions(GetClientSourceCode, context, Id)
+            .AddSource(context);
+        context.SyntaxProvider
+            .ForAttributeWithMetadataName("H.IpcGenerators.IpcServerAttribute")
+            .SelectManyAllAttributesOfCurrentClassSyntax()
+            .SelectAndReportExceptions(PrepareData, context, Id)
+            .SelectAndReportExceptions(GetServerSourceCode, context, Id)
+            .AddSource(context);
+        context.SyntaxProvider
+            .ForAttributeWithMetadataName("H.IpcGenerators.IpcClientAttribute")
+            .SelectManyAllAttributesOfCurrentClassSyntax()
+            .SelectAndReportExceptions(PrepareData, context, Id)
+            .SelectAndReportExceptions(GetClientRequestsSourceCode, context, Id)
+            .AddSource(context);
+        context.SyntaxProvider
+            .ForAttributeWithMetadataName("H.IpcGenerators.IpcServerAttribute")
+            .SelectManyAllAttributesOfCurrentClassSyntax()
+            .SelectAndReportExceptions(PrepareData, context, Id)
+            .SelectAndReportExceptions(GetServerRequestsSourceCode, context, Id)
+            .AddSource(context);
     }
 
-    private static void Execute(
-        Compilation compilation,
-        ImmutableArray<(ClassDeclarationSyntax Class, string FullName)?> classSyntaxes,
-        SourceProductionContext context)
+    private static ClassData PrepareData(
+        (SemanticModel SemanticModel, AttributeData AttributeData, ClassDeclarationSyntax ClassSyntax, INamedTypeSymbol ClassSymbol) tuple)
     {
-        if (classSyntaxes.IsDefaultOrEmpty)
-        {
-            return;
-        }
+        var (_, _, _, classSymbol) = tuple;
+        
+        var @interface = classSymbol.Interfaces.First();
+        var methods = @interface
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .ToArray();
+        
+        var fullClassName = classSymbol.ToString();
+        var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
+        var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
+        var interfaceName = @interface.Name;
 
-        try
-        {
-            var distinctClassSyntaxes = classSyntaxes
-                .Where(static tuple => tuple!.Value.FullName == IpcClientAttributeFullName)
-                .Select(static tuple => tuple!.Value.Class)
-                .Distinct()
-                .ToArray();
-
-            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
-            foreach (var @class in classes)
-            {
-                context.AddTextSource(
-                    hintName: $"{@class.Name}.generated.cs",
-                    text: SourceGenerationHelper.GenerateClientImplementation(@class));
-            }
-        }
-        catch (Exception exception)
-        {
-            context.ReportException(
-                id: "001",
-                exception: exception,
-                prefix: Id);
-        }
-
-        try
-        {
-            var distinctClassSyntaxes = classSyntaxes
-                .Where(static tuple => tuple!.Value.FullName == IpcServerAttributeFullName)
-                .Select(static tuple => tuple!.Value.Class)
-                .Distinct()
-                .ToArray();
-
-            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
-            foreach (var @class in classes)
-            {
-                context.AddTextSource(
-                    hintName: $"{@class.Name}.generated.cs",
-                    text: SourceGenerationHelper.GenerateServerImplementation(@class));
-            }
-        }
-        catch (Exception exception)
-        {
-            context.ReportException(
-                id: "001",
-                exception: exception,
-                prefix: Id);
-        }
-
-        try
-        {
-            var distinctClassSyntaxes = classSyntaxes
-                .Where(static tuple =>
-                    tuple!.Value.FullName == IpcServerAttributeFullName ||
-                    tuple.Value.FullName == IpcClientAttributeFullName)
-                .Select(static tuple => tuple!.Value.Class)
-                .Distinct()
-                .ToArray();
-
-            var classes = GetTypesToGenerate(compilation, distinctClassSyntaxes, context.CancellationToken);
-            foreach (var @class in classes
-                .GroupBy(static @class => @class.InterfaceName)
-                .Distinct()
-                .Select(static group => group.First()))
-            {
-                context.AddTextSource(
-                    hintName: $"{@class.InterfaceName}_Requests.generated.cs",
-                    text: SourceGenerationHelper.GenerateRequests(@class));
-            }
-        }
-        catch (Exception exception)
-        {
-            context.ReportException(
-                id: "001",
-                exception: exception,
-                prefix: Id);
-        }
+        return new ClassData(
+            Namespace: @namespace,
+            Name: className,
+            InterfaceName: interfaceName,
+            Methods: methods);
     }
-
-    private static List<ClassData> GetTypesToGenerate(
-        Compilation compilation,
-        IEnumerable<ClassDeclarationSyntax> enums,
-        CancellationToken cancellationToken)
+    
+    private static FileWithName GetClientSourceCode(ClassData @class)
     {
-        var enumsToGenerate = new List<ClassData>();
-        foreach (var classDeclarationSyntax in enums)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var semanticModel = compilation.GetSemanticModel(classDeclarationSyntax.SyntaxTree);
-            if (semanticModel.GetDeclaredSymbol(
-                classDeclarationSyntax, cancellationToken) is not INamedTypeSymbol classSymbol)
-            {
-                continue;
-            }
-
-            var @interface = classSymbol.Interfaces.First();
-            var methods = @interface
-                .GetMembers()
-                .OfType<IMethodSymbol>()
-                .ToArray();
-            
-            var fullClassName = classSymbol.ToString();
-            var @namespace = fullClassName.Substring(0, fullClassName.LastIndexOf('.'));
-            var className = fullClassName.Substring(fullClassName.LastIndexOf('.') + 1);
-            var interfaceName = @interface.Name;
-
-            enumsToGenerate.Add(new ClassData(@namespace, className, interfaceName, methods));
-        }
-
-        return enumsToGenerate;
+        return new FileWithName(
+            Name: $"{@class.Name}.IpcClient.generated.cs",
+            Text: SourceGenerationHelper.GenerateClientImplementation(@class));
+    }
+    
+    private static FileWithName GetServerSourceCode(ClassData @class)
+    {
+        return new FileWithName(
+            Name: $"{@class.Name}.IpcServer.generated.cs",
+            Text: SourceGenerationHelper.GenerateServerImplementation(@class));
+    }
+    
+    private static FileWithName GetClientRequestsSourceCode(ClassData @class)
+    {
+        return new FileWithName(
+            Name: $"{@class.InterfaceName}.ClientRequests.generated.cs",
+            Text: SourceGenerationHelper.GenerateRequests(@class, server: false));
+    }
+    
+    private static FileWithName GetServerRequestsSourceCode(ClassData @class)
+    {
+        return new FileWithName(
+            Name: $"{@class.InterfaceName}.ServerRequests.generated.cs",
+            Text: SourceGenerationHelper.GenerateRequests(@class, server: true));
     }
 
     #endregion
 }
-
-public readonly record struct ClassData(
-    string Namespace,
-    string Name,
-    string InterfaceName,
-    IReadOnlyCollection<IMethodSymbol> Methods);

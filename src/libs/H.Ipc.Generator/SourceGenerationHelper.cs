@@ -2,7 +2,7 @@
 
 namespace H.Generators;
 
-internal class SourceGenerationHelper
+internal static class SourceGenerationHelper
 {
     public static string GenerateClientImplementation(ClassData @class)
     {
@@ -35,7 +35,7 @@ namespace {@class.Namespace}
         {{
             try
             {{
-                await WriteAsync(new {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => parameter.Name))})).ConfigureAwait(false);
+                await WriteAsync(new {method.Name}ClientMethod({string.Join(", ", method.Parameters.Select(static parameter => parameter.Name))})).ConfigureAwait(false);
             }}
             catch (global::System.Exception exception)
             {{
@@ -95,7 +95,7 @@ namespace {@class.Namespace}
 {@class.Methods.Select(static method => $@"
                             case nameof({method.Name}):
                                 {{
-                                    var arguments = Deserialize<{method.Name}Method>(json);
+                                    var arguments = Deserialize<{method.Name}ServerMethod>(json);
                                     {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"arguments.{parameter.Name.ToPropertyName()}")).TrimEnd(',', ' ', '\n', '\r')});
                                     break;
                                 }}
@@ -122,21 +122,21 @@ namespace {@class.Namespace}
 }}";
     }
 
-    public static string GenerateRequests(ClassData @class)
+    public static string GenerateRequests(ClassData @class, bool server)
     {
         return @$"
 #nullable enable
 
 namespace {@class.Namespace}
 {{
-{@class.Methods.Select(static method => $@"
-    public class {method.Name}Method : global::H.IpcGenerators.RunMethodRequest
+{@class.Methods.Select(method => $@"
+    public class {method.Name}{(server ? "Server" : "Client")}Method : global::H.IpcGenerators.RunMethodRequest
     {{
 {method.Parameters.Select(static parameter => $@"
         public {parameter.Type} {parameter.Name.ToPropertyName()} {{ get; set; }}
 ").Inject()}
  
-        public {method.Name}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
+        public {method.Name}{(server ? "Server" : "Client")}Method({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
             Name = ""{method.Name}"";
 {method.Parameters.Select(static parameter => $@" 

@@ -1,4 +1,4 @@
-﻿//HintName: ActionServiceClient.generated.cs
+﻿//HintName: ActionServiceClient.IpcClient.generated.cs
 
 #nullable enable
 
@@ -32,7 +32,7 @@ namespace H.Ipc.Apps.Wpf
         {
             try
             {
-                await WriteAsync(new ShowTrayIconMethod()).ConfigureAwait(false);
+                await WriteAsync(new ShowTrayIconClientMethod()).ConfigureAwait(false);
             }
             catch (global::System.Exception exception)
             {
@@ -44,7 +44,7 @@ namespace H.Ipc.Apps.Wpf
         {
             try
             {
-                await WriteAsync(new HideTrayIconMethod()).ConfigureAwait(false);
+                await WriteAsync(new HideTrayIconClientMethod()).ConfigureAwait(false);
             }
             catch (global::System.Exception exception)
             {
@@ -56,7 +56,7 @@ namespace H.Ipc.Apps.Wpf
         {
             try
             {
-                await WriteAsync(new SendTextMethod(text)).ConfigureAwait(false);
+                await WriteAsync(new SendTextClientMethod(text)).ConfigureAwait(false);
             }
             catch (global::System.Exception exception)
             {

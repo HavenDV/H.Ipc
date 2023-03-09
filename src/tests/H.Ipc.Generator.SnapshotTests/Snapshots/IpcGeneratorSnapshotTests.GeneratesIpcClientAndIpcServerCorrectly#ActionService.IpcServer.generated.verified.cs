@@ -1,4 +1,4 @@
-﻿//HintName: ActionService.generated.cs
+﻿//HintName: ActionService.IpcServer.generated.cs
 
 #nullable enable
 
@@ -34,21 +34,21 @@ namespace H.Ipc.Apps.Wpf
                         {
                             case nameof(ShowTrayIcon):
                                 {
-                                    var arguments = Deserialize<ShowTrayIconMethod>(json);
+                                    var arguments = Deserialize<ShowTrayIconServerMethod>(json);
                                     ShowTrayIcon();
                                     break;
                                 }
 
                             case nameof(HideTrayIcon):
                                 {
-                                    var arguments = Deserialize<HideTrayIconMethod>(json);
+                                    var arguments = Deserialize<HideTrayIconServerMethod>(json);
                                     HideTrayIcon();
                                     break;
                                 }
 
                             case nameof(SendText):
                                 {
-                                    var arguments = Deserialize<SendTextMethod>(json);
+                                    var arguments = Deserialize<SendTextServerMethod>(json);
                                     SendText(arguments.Text);
                                     break;
                                 }
