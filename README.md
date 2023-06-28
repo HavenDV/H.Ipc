@@ -5,7 +5,7 @@ Generation example: https://github.com/HavenDV/H.ProxyFactory/issues/7#issuecomm
 ### Nuget
 [![NuGet](https://img.shields.io/nuget/dt/H.Ipc.svg?style=flat-square&label=H.Ipc)](https://www.nuget.org/packages/H.Ipc/)
 ```
-Install-Package H.Ipc.Core
+Install-Package H.Ipc
 ```
 
 ### Usage
