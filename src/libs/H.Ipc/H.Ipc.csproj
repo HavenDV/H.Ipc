@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net4.6.2</TargetFrameworks>
+    <RootNamespace>H.Ipc.Core</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet">
+    <Description>Core library for Inter-Process Communication.</Description>
+    <PackageTags>ipc, generator, source generator, csharp 9</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Label="Usings">
+    <Using Include="System.Diagnostics" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\H.Ipc.Generator\H.Ipc.Generator.csproj" ReferenceOutputAssembly="false" PackAsAnalyzer="true" />
+    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.51" />
+    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.51" />
+  </ItemGroup>
+
+</Project>

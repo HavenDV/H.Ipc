@@ -8,7 +8,7 @@ public class IpcGeneratorIntegrationTests
     [TestMethod]
     public async Task GeneratesIpcClientAndIpcServerCorrectly()
     {
-        const string serverName = nameof(GeneratesIpcClientAndIpcServerCorrectly);
+        const string serverName = "H.Ipc";
 
         // Server initialization
         await using var server = new PipeServer<string>(serverName);

@@ -2,35 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CA1014;CA1031</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Label="NuGet">
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <!--<DevelopmentDependency>true</DevelopmentDependency>-->
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <IncludeSymbols>false</IncludeSymbols>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <Description>C# Source Generator for Inter-Process Communication.</Description>
-    <PackageTags>ipc;generator;source generator;pipes</PackageTags>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.47" />
-    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.47" />
     <PackageReference Include="IsExternalInit" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
     <PackageReference Include="H.Generators.Extensions" Version="1.14.2" PrivateAssets="all" />
-    <ProjectReference Include="..\H.Ipc.Core\H.Ipc.Core.csproj" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="$(AssemblyName).props" Pack="true" PackagePath="build" />
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\H.Ipc.Core.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 
 </Project>

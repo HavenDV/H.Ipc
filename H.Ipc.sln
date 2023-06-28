@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Apps.Wpf", "src\apps\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Generator.SnapshotTests", "src\tests\H.Ipc.Generator.SnapshotTests\H.Ipc.Generator.SnapshotTests.csproj", "{800AFF76-1B2B-41F6-8566-18E86D4F13F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Core", "src\libs\H.Ipc.Core\H.Ipc.Core.csproj", "{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc", "src\libs\H.Ipc\H.Ipc.csproj", "{CB16ACB3-DDE0-40BE-9648-B7B0305B85F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

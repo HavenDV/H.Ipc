@@ -3,11 +3,9 @@ This generator allows you to generate boilerplate code for [H.Pipes](https://git
 Generation example: https://github.com/HavenDV/H.ProxyFactory/issues/7#issuecomment-1072287342
 
 ### Nuget
-[![NuGet](https://img.shields.io/nuget/dt/H.Ipc.Generator.svg?style=flat-square&label=H.Ipc.Generator)](https://www.nuget.org/packages/H.Ipc.Generator/)
+[![NuGet](https://img.shields.io/nuget/dt/H.Ipc.svg?style=flat-square&label=H.Ipc)](https://www.nuget.org/packages/H.Ipc/)
 ```
-Install-Package H.Ipc.Generator
 Install-Package H.Ipc.Core
-Install-Package H.Pipes
 ```
 
 ### Usage
