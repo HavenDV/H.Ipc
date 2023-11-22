@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net4.6.2</TargetFrameworks>
@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H.Ipc.Generator\H.Ipc.Generator.csproj" ReferenceOutputAssembly="false" PackAsAnalyzer="true" />
-    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.51" />
-    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.51" />
+    <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.53" />
+    <PackageReference Include="H.Pipes.AccessControl" Version="2.0.53" />
   </ItemGroup>
 
 </Project>
