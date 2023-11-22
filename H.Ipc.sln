@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 		LICENSE = LICENSE
 		README.md = README.md
+		.github\dependabot.yml = .github\dependabot.yml
+		.github\workflows\pull-request.yml = .github\workflows\pull-request.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Ipc.Generator.IntegrationTests", "src\tests\H.Ipc.Generator.IntegrationTests\H.Ipc.Generator.IntegrationTests.csproj", "{3B17FE3E-7DFC-4008-8F3C-492D215A5EBD}"
