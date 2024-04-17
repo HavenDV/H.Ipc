@@ -7,13 +7,16 @@ public class IpcGeneratorSnapshotTests : VerifyBase
     public Task GeneratesIpcClientAndIpcServerCorrectly()
     {
         return this.CheckSourceAsync(@"
+using System.Threading.Tasks;
+
 namespace H.Ipc.Apps.Wpf;
 
 public interface IActionService
 {
-    void ShowTrayIcon();
-    void HideTrayIcon();
-    void SendText(string text);
+    Task ShowTrayIcon();
+    Task HideTrayIcon();
+    Task SendText(string text);
+    Task<int> GetPoints();
 }
 
 [H.IpcGenerators.IpcClient]
@@ -24,16 +27,24 @@ public partial class ActionServiceClient : IActionService
 [H.IpcGenerators.IpcServer]
 public partial class ActionService : IActionService
 {
-    public void ShowTrayIcon()
+    public Task ShowTrayIcon()
     {
+        return Task.CompletedTask;
     }
 
-    public void HideTrayIcon()
+    public Task HideTrayIcon()
     {
+        return Task.CompletedTask;
     }
 
-    public void SendText(string text)
+    public Task SendText(string text)
     {
+        return Task.CompletedTask;
+    }
+
+    public Task<int> GetPoints()
+    {
+        return Task.FromResult(42);
     }
 }");
     }

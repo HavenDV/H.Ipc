@@ -29,4 +29,12 @@ namespace H.Ipc.Apps.Wpf
             Text = text ?? throw new global::System.ArgumentNullException(nameof(text));
         }
     }
+
+    public class GetPointsServerMethod : global::H.IpcGenerators.RunMethodRequest
+    {
+        public GetPointsServerMethod()
+        {
+            Name = "GetPoints";
+        }
+    }
 }

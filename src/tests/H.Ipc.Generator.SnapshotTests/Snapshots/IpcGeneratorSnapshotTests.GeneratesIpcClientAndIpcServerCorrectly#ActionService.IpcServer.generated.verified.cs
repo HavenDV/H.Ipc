@@ -2,6 +2,8 @@
 
 #nullable enable
 
+using H.IpcGenerators;
+
 namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionService
@@ -20,7 +22,7 @@ namespace H.Ipc.Apps.Wpf
         public void Initialize(global::H.Pipes.IPipeConnection<string> connection)
         {
             connection = connection ?? throw new global::System.ArgumentNullException(nameof(connection));
-            connection.MessageReceived += (_, args) =>
+            connection.MessageReceived += async (_, args) =>
             {
                 try
                 {
@@ -33,31 +35,41 @@ namespace H.Ipc.Apps.Wpf
                         switch (method.Name)
                         {
                             case nameof(ShowTrayIcon):
-                                {
-                                    var arguments = Deserialize<ShowTrayIconServerMethod>(json);
-                                    ShowTrayIcon();
-                                    break;
-                                }
-
+                            {
+                                var arguments = Deserialize<ShowTrayIconServerMethod>(json);
+                                await ShowTrayIcon();
+                                break;
+                            }
                             case nameof(HideTrayIcon):
-                                {
-                                    var arguments = Deserialize<HideTrayIconServerMethod>(json);
-                                    HideTrayIcon();
-                                    break;
-                                }
-
+                            {
+                                var arguments = Deserialize<HideTrayIconServerMethod>(json);
+                                await HideTrayIcon();
+                                break;
+                            }
                             case nameof(SendText):
-                                {
-                                    var arguments = Deserialize<SendTextServerMethod>(json);
-                                    SendText(arguments.Text);
-                                    break;
-                                }
+                            {
+                                var arguments = Deserialize<SendTextServerMethod>(json);
+                                await SendText(arguments.Text);
+                                break;
+                            }
+                            case nameof(GetPoints):
+                            {
+                                var arguments = Deserialize<GetPointsServerMethod>(json);
+                                var resultCore = await GetPoints();
+                                var result = ReturnMethodResultFactory.Create(resultCore);
+                                var jsonStr = Serialize(result);
+                                await connection.WriteAsync(jsonStr).ConfigureAwait(false);
+                                break;
+                            }
                         }
                     }
                 }
                 catch (global::System.Exception exception)
                 {
                     OnExceptionOccurred(exception);
+                    var result = new ReturnMethodResultRequest(false, exception.Message);
+                    var jsonStr = Serialize(result);
+                    await connection.WriteAsync(jsonStr).ConfigureAwait(false);
                 }
             };
         }
@@ -69,6 +81,11 @@ namespace H.Ipc.Apps.Wpf
                 throw new global::System.ArgumentException($@"Returned null when trying to deserialize to {typeof(T)}.
     json:
     {json}");
+        }
+
+        private static string Serialize<T>(T obj)
+        {
+            return global::System.Text.Json.JsonSerializer.Serialize(obj);
         }
     }
 }

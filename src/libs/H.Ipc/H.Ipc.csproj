@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net4.6.2</TargetFrameworks>
     <RootNamespace>H.Ipc.Core</RootNamespace>
+    <Version>0.22.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
@@ -15,9 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+    <PackageReference Include="System.IO.Pipes.AccessControl" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
     <ProjectReference Include="..\H.Ipc.Generator\H.Ipc.Generator.csproj" ReferenceOutputAssembly="false" PackAsAnalyzer="true" />
     <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.51" />
+    <PackageReference Include="H.Generators.Extensions" Version="1.22.0" PrivateAssets="all" IncludeInPackage="true" />
     <PackageReference Include="H.Pipes.AccessControl" Version="2.0.59" />
   </ItemGroup>
-
 </Project>

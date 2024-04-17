@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using H.Generators.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace H.Generators;
@@ -21,7 +22,7 @@ public class HIpcGenerator : IIncrementalGenerator
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcClientAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .SelectAndReportExceptions(PrepareData, context, Id)
-            .SelectAndReportExceptions(GetClientSourceCode, context, Id)
+            .SelectAndReportExceptions((classData) => GetClientSourceCode(classData, context), context, Id)
             .AddSource(context);
         context.SyntaxProvider
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcServerAttribute")
@@ -65,14 +66,14 @@ public class HIpcGenerator : IIncrementalGenerator
             InterfaceName: interfaceName,
             Methods: methods);
     }
-    
-    private static FileWithName GetClientSourceCode(ClassData @class)
+
+    private static FileWithName GetClientSourceCode(ClassData @class, IncrementalGeneratorInitializationContext context)
     {
         return new FileWithName(
             Name: $"{@class.Name}.IpcClient.generated.cs",
             Text: SourceGenerationHelper.GenerateClientImplementation(@class));
     }
-    
+
     private static FileWithName GetServerSourceCode(ClassData @class)
     {
         return new FileWithName(

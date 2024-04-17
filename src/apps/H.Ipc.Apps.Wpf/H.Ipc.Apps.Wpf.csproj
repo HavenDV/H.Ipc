@@ -3,8 +3,13 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>net6.0-windows;net4.8</TargetFrameworks>
+<!--    <TargetFramework>net48</TargetFramework>-->
     <UseWPF>true</UseWPF>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>;CODE_ANALYSIS;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
