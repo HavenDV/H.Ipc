@@ -22,7 +22,7 @@ public class HIpcGenerator : IIncrementalGenerator
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcClientAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .SelectAndReportExceptions(PrepareData, context, Id)
-            .SelectAndReportExceptions((classData) => GetClientSourceCode(classData), context, Id)
+            .SelectAndReportExceptions(GetClientSourceCode, context, Id)
             .AddSource(context);
         context.SyntaxProvider
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcServerAttribute")
