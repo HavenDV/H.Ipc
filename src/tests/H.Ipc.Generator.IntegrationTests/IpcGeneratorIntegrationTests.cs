@@ -10,8 +10,6 @@ public class IpcGeneratorIntegrationTests
     {
         const string serverName = "H.Ipc";
 
-        var x = new TaskCompletionSource();
-
         // Server initialization
         await using var server = new PipeServer<string>(serverName);
         var service = new ActionService();

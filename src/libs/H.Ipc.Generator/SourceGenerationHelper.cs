@@ -11,10 +11,6 @@ internal static class SourceGenerationHelper
         return @$"
 #nullable enable
 
-using H.IpcGenerators;
-using System;
-using System.Threading.Tasks;
-
 namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
@@ -68,7 +64,7 @@ namespace {@class.Namespace}
         {
             if (isWaitingForServerResponse)
             {
-                throw new InvalidOperationException(""Cannot perform this operation while waiting for server response."");
+                throw new global::System.InvalidOperationException(""Cannot perform this operation while waiting for server response."");
             }
         }
 ";
@@ -87,22 +83,25 @@ namespace {@class.Namespace}
         if(method.ReturnType is INamedTypeSymbol { Arity: 1 } namedTypeSymbol)
         {
             var coreReturnType = namedTypeSymbol.TypeArguments.First();
+            var namespaceSymbol = coreReturnType.ContainingNamespace;
+            var coreReturnTypeNamespace = namespaceSymbol?.Name ?? "";
+            var coreReturnTypeFullName = $"{coreReturnTypeNamespace}.{coreReturnType.Name}";
             
             return $@"
         public async {method.ReturnType} {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"{parameter.Type} {parameter.Name}"))})
         {{
             ThrowIfWaitingForServer();
 
-            var tcs = new TaskCompletionSource<{coreReturnType.Name}>();
+            var tcs = new global::System.Threading.Tasks.TaskCompletionSource<{coreReturnTypeFullName}>();
 
             void ReceiveResult(object? sender, H.Pipes.Args.ConnectionMessageEventArgs<string?> e)
             {{
-                var jsonResult = e.Message ?? throw new ArgumentException(""Message property of received H.Pipes.Args.ConnectionMessageEventArgs<string> object is null"");
-                var result = default({coreReturnType.Name});
-                var resultGeneral = global::System.Text.Json.JsonSerializer.Deserialize<ReturnMethodResultRequest>(jsonResult);
+                var jsonResult = e.Message ?? throw new global::System.ArgumentException(""Message property of received H.Pipes.Args.ConnectionMessageEventArgs<string> object is null"");
+                var result = default({coreReturnTypeFullName});
+                var resultGeneral = global::System.Text.Json.JsonSerializer.Deserialize<global::H.IpcGenerators.ReturnMethodResultRequest>(jsonResult);
                 if (resultGeneral?.ResultType == ""{coreReturnType.Name}"")
                 {{
-                    var resultSpecific = global::System.Text.Json.JsonSerializer.Deserialize<ReturnMethodResultRequest<{coreReturnType.Name}>>(jsonResult);
+                    var resultSpecific = global::System.Text.Json.JsonSerializer.Deserialize<global::H.IpcGenerators.ReturnMethodResultRequest<{coreReturnTypeFullName}>>(jsonResult);
                     if (resultSpecific != null)
                     {{
                         result = resultSpecific.Result;
@@ -127,7 +126,7 @@ namespace {@class.Namespace}
             {{
                 isWaitingForServerResponse = false;
                 OnExceptionOccurred(exception);
-                return await Task.FromException<{coreReturnType}>(exception);
+                return await global::System.Threading.Tasks.Task.FromException<{coreReturnType}>(exception);
             }}
         }}
 ";
@@ -177,8 +176,6 @@ namespace {@class.Namespace}
         return @$"
 #nullable enable
 
-using H.IpcGenerators;
-
 namespace {@class.Namespace}
 {{
     public partial class {@class.Name}
@@ -211,7 +208,7 @@ namespace {@class.Namespace}
                 catch (global::System.Exception exception)
                 {{
                     OnExceptionOccurred(exception);
-                    var result = new ReturnMethodResultRequest(false, exception.Message);
+                    var result = new global::H.IpcGenerators.ReturnMethodResultRequest(false, exception.Message);
                     var jsonStr = Serialize(result);
                     await connection.WriteAsync(jsonStr).ConfigureAwait(false);
                 }}
@@ -252,7 +249,7 @@ namespace {@class.Namespace}
                             {{
                                 var arguments = Deserialize<{method.Name}ServerMethod>(json);
                                 var resultCore = await {method.Name}({string.Join(", ", method.Parameters.Select(static parameter => $"arguments.{parameter.Name.ToPropertyName()}")).TrimEnd(',', ' ', '\n', '\r')});
-                                var result = ReturnMethodResultFactory.Create(resultCore);
+                                var result = global::H.IpcGenerators.ReturnMethodResultFactory.Create(resultCore);
                                 var jsonStr = Serialize(result);
                                 await connection.WriteAsync(jsonStr).ConfigureAwait(false);
                                 break;

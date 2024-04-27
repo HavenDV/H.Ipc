@@ -2,10 +2,6 @@
 
 #nullable enable
 
-using H.IpcGenerators;
-using System;
-using System.Threading.Tasks;
-
 namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionServiceClient
@@ -41,7 +37,7 @@ namespace H.Ipc.Apps.Wpf
         {
             if (isWaitingForServerResponse)
             {
-                throw new InvalidOperationException("Cannot perform this operation while waiting for server response.");
+                throw new global::System.InvalidOperationException("Cannot perform this operation while waiting for server response.");
             }
         }
 
@@ -94,16 +90,16 @@ namespace H.Ipc.Apps.Wpf
         {
             ThrowIfWaitingForServer();
 
-            var tcs = new TaskCompletionSource<Int32>();
+            var tcs = new global::System.Threading.Tasks.TaskCompletionSource<System.Int32>();
 
             void ReceiveResult(object? sender, H.Pipes.Args.ConnectionMessageEventArgs<string?> e)
             {
-                var jsonResult = e.Message ?? throw new ArgumentException("Message property of received H.Pipes.Args.ConnectionMessageEventArgs<string> object is null");
-                var result = default(Int32);
-                var resultGeneral = global::System.Text.Json.JsonSerializer.Deserialize<ReturnMethodResultRequest>(jsonResult);
+                var jsonResult = e.Message ?? throw new global::System.ArgumentException("Message property of received H.Pipes.Args.ConnectionMessageEventArgs<string> object is null");
+                var result = default(System.Int32);
+                var resultGeneral = global::System.Text.Json.JsonSerializer.Deserialize<global::H.IpcGenerators.ReturnMethodResultRequest>(jsonResult);
                 if (resultGeneral?.ResultType == "Int32")
                 {
-                    var resultSpecific = global::System.Text.Json.JsonSerializer.Deserialize<ReturnMethodResultRequest<Int32>>(jsonResult);
+                    var resultSpecific = global::System.Text.Json.JsonSerializer.Deserialize<global::H.IpcGenerators.ReturnMethodResultRequest<System.Int32>>(jsonResult);
                     if (resultSpecific != null)
                     {
                         result = resultSpecific.Result;
@@ -128,7 +124,7 @@ namespace H.Ipc.Apps.Wpf
             {
                 isWaitingForServerResponse = false;
                 OnExceptionOccurred(exception);
-                return await Task.FromException<int>(exception);
+                return await global::System.Threading.Tasks.Task.FromException<int>(exception);
             }
         }
 

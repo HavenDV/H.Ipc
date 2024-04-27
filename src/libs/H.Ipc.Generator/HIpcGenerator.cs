@@ -22,7 +22,7 @@ public class HIpcGenerator : IIncrementalGenerator
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcClientAttribute")
             .SelectManyAllAttributesOfCurrentClassSyntax()
             .SelectAndReportExceptions(PrepareData, context, Id)
-            .SelectAndReportExceptions((classData) => GetClientSourceCode(classData, context), context, Id)
+            .SelectAndReportExceptions((classData) => GetClientSourceCode(classData), context, Id)
             .AddSource(context);
         context.SyntaxProvider
             .ForAttributeWithMetadataName("H.IpcGenerators.IpcServerAttribute")
@@ -67,7 +67,7 @@ public class HIpcGenerator : IIncrementalGenerator
             Methods: methods);
     }
 
-    private static FileWithName GetClientSourceCode(ClassData @class, IncrementalGeneratorInitializationContext context)
+    private static FileWithName GetClientSourceCode(ClassData @class)
     {
         return new FileWithName(
             Name: $"{@class.Name}.IpcClient.generated.cs",

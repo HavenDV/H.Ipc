@@ -4,7 +4,7 @@ namespace H.Ipc.Apps.Wpf;
 
 public class Person
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
 }
 
 public interface IActionService
@@ -15,8 +15,6 @@ public interface IActionService
 
     Task<int> CalculateResult();
     Task<Person> GetPerson();
-
-    //event EventHandler<string> TextReceived;
 }
 
 [H.IpcGenerators.IpcClient]

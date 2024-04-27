@@ -2,8 +2,6 @@
 
 #nullable enable
 
-using H.IpcGenerators;
-
 namespace H.Ipc.Apps.Wpf
 {
     public partial class ActionService
@@ -56,7 +54,7 @@ namespace H.Ipc.Apps.Wpf
                             {
                                 var arguments = Deserialize<GetPointsServerMethod>(json);
                                 var resultCore = await GetPoints();
-                                var result = ReturnMethodResultFactory.Create(resultCore);
+                                var result = global::H.IpcGenerators.ReturnMethodResultFactory.Create(resultCore);
                                 var jsonStr = Serialize(result);
                                 await connection.WriteAsync(jsonStr).ConfigureAwait(false);
                                 break;
@@ -67,7 +65,7 @@ namespace H.Ipc.Apps.Wpf
                 catch (global::System.Exception exception)
                 {
                     OnExceptionOccurred(exception);
-                    var result = new ReturnMethodResultRequest(false, exception.Message);
+                    var result = new global::H.IpcGenerators.ReturnMethodResultRequest(false, exception.Message);
                     var jsonStr = Serialize(result);
                     await connection.WriteAsync(jsonStr).ConfigureAwait(false);
                 }
