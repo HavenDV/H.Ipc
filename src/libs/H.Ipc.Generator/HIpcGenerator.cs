@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using H.Generators.Extensions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace H.Generators;
@@ -65,14 +66,14 @@ public class HIpcGenerator : IIncrementalGenerator
             InterfaceName: interfaceName,
             Methods: methods);
     }
-    
+
     private static FileWithName GetClientSourceCode(ClassData @class)
     {
         return new FileWithName(
             Name: $"{@class.Name}.IpcClient.generated.cs",
             Text: SourceGenerationHelper.GenerateClientImplementation(@class));
     }
-    
+
     private static FileWithName GetServerSourceCode(ClassData @class)
     {
         return new FileWithName(

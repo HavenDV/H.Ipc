@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Windows;
 using H.Pipes;
 
 namespace H.Ipc.Apps.Wpf;
@@ -73,11 +74,11 @@ public partial class ClientWindow
         }
     }
 
-    private void RaiseEvent1Button_Click(object sender, RoutedEventArgs e)
+    private async void RaiseEvent1Button_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            ActionServiceClient.ShowTrayIcon();
+            await ActionServiceClient.ShowTrayIcon();
             //if (Instance == null)
             //{
             //    return;
@@ -92,11 +93,11 @@ public partial class ClientWindow
         }
     }
 
-    private void RaiseEvent3Button_Click(object sender, RoutedEventArgs e)
+    private async void RaiseEvent3Button_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            ActionServiceClient.HideTrayIcon();
+            await ActionServiceClient.HideTrayIcon();
             //if (Instance == null)
             //{
             //    return;
@@ -129,11 +130,11 @@ public partial class ClientWindow
         }
     }
 
-    private void Method2Button_Click(object sender, RoutedEventArgs e)
+    private async void Method2Button_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            ActionServiceClient.SendText(Method2ArgumentTextBox.Text);
+            await ActionServiceClient.SendText(Method2ArgumentTextBox.Text);
         }
         catch (Exception exception)
         {

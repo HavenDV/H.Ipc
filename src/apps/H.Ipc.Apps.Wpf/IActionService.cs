@@ -2,13 +2,19 @@
 
 namespace H.Ipc.Apps.Wpf;
 
+public class Person
+{
+    public string? Name { get; set; }
+}
+
 public interface IActionService
 {
-    void SendText(string text);
-    void ShowTrayIcon();
-    void HideTrayIcon();
+    Task SendText(string text);
+    Task ShowTrayIcon();
+    Task HideTrayIcon();
 
-    //event EventHandler<string> TextReceived;
+    Task<int> CalculateResult();
+    Task<Person> GetPerson();
 }
 
 [H.IpcGenerators.IpcClient]
@@ -19,18 +25,31 @@ public partial class ActionServiceClient : IActionService
 [H.IpcGenerators.IpcServer]
 public partial class ActionService : IActionService
 {
-    public void ShowTrayIcon()
+    public Task ShowTrayIcon()
     {
         MessageBox.Show(nameof(ShowTrayIcon));
+        return Task.CompletedTask;
     }
 
-    public void HideTrayIcon()
+    public Task HideTrayIcon()
     {
         MessageBox.Show(nameof(HideTrayIcon));
+        return Task.CompletedTask;
     }
 
-    public void SendText(string text)
+    public Task<Person> GetPerson()
+    {
+        return Task.FromResult(new Person());
+    }
+
+    public Task<int> CalculateResult()
+    {
+        return Task.FromResult(10);
+    }
+
+    public Task SendText(string text)
     {
         MessageBox.Show(text);
+        return Task.CompletedTask;
     }
 }

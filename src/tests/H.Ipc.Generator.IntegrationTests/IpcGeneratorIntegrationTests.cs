@@ -23,9 +23,17 @@ public class IpcGeneratorIntegrationTests
         await client.ConnectAsync();
 
         // Client usage
-        serviceClient.ShowTrayIcon();
-        serviceClient.HideTrayIcon();
-        serviceClient.SendText("Hello, World!");
+        await serviceClient.ShowTrayIcon();
+        await serviceClient.HideTrayIcon();
+        await serviceClient.SendText("Hello, World!");
+        
+        var dataPointResult = await serviceClient.GetMeasurement();
+        dataPointResult.X.Should().Be(10);
+        dataPointResult.Y.Should().Be(20);
+        dataPointResult.Temperature.Should().Be(25);
+        
+        var result = await serviceClient.GetPoints();
+        result.Should().Be(42);
 
         await Task.Delay(TimeSpan.FromSeconds(5));
 
