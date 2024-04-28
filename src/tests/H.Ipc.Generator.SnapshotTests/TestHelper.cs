@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+﻿using H.Generators.Tests.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Testing;
@@ -12,8 +12,8 @@ public static class TestHelper
         string source,
         CancellationToken cancellationToken = default)
     {
-        var referenceAssemblies = ReferenceAssemblies.Net.Net60
-            .WithPackages(ImmutableArray.Create(new PackageIdentity("H.Pipes.AccessControl", "2.0.47")));
+        var referenceAssemblies = LatestReferenceAssemblies.Net80
+            .WithPackages([new PackageIdentity("H.Pipes.AccessControl", "2.0.59")]);
         var references = await referenceAssemblies.ResolveAsync(null, cancellationToken);
         references = references
             .Add(MetadataReference.CreateFromFile(typeof(H.IpcGenerators.IpcClientAttribute).Assembly.Location));
