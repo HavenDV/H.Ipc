@@ -20,5 +20,7 @@
     <PackageReference Include="H.Formatters.System.Text.Json" Version="12.0.51" />
     <PackageReference Include="H.Generators.Extensions" Version="1.22.0" PrivateAssets="all" IncludeInPackage="true" />
     <PackageReference Include="H.Pipes.AccessControl" Version="2.0.59" />
+    <None Include="..\H.Ipc.Generator\bin\$(Configuration)\netstandard2.0\H.Generators.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet" Visible="false" />
   </ItemGroup>
+  
 </Project>
