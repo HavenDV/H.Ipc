@@ -13,29 +13,38 @@ Install-Package H.Ipc
 // Common interface
 public interface IActionService
 {
-    void ShowTrayIcon();
-    void HideTrayIcon();
-    void SendText(string text);
+    Task ShowTrayIcon();
+    Task HideTrayIcon();
+    Task SendText(string text);
+    Task<int> GetAnswer(string question);
 }
 
 // Server side implementation
 [H.IpcGenerators.IpcServer]
 public partial class ActionService : IActionService
 {
-    public void ShowTrayIcon()
+    public Task ShowTrayIcon()
     {
         MessageBox.Show(nameof(ShowTrayIcon));
+        return Task.CompletedTask;
     }
 
-    public void HideTrayIcon()
+    public Task HideTrayIcon()
     {
         MessageBox.Show(nameof(HideTrayIcon));
+        return Task.CompletedTask;
     }
 
-    public void SendText(string text)
+    public Task SendText(string text)
     {
         MessageBox.Show(text);
+        return Task.CompletedTask;
     }
+    
+    public async Task<int> GetAnswer(string question)
+    {
+        return await Simulator.CalculateAnswer(question);
+    }    
 }
 
 // Client side implementation
@@ -57,7 +66,9 @@ service.Initialize(client);
 await client.ConnectAsync();
 
 // Client usage
-client.ShowTrayIcon();
+await client.ShowTrayIcon();
+await client.SendText("Hello world!");
+var result = await client.GetAnswer("What's the answer to the ultimate question of life, the universe, and everything?");
 ```
 
 ### Notes
