@@ -17,9 +17,9 @@
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="8.0.0" />
     <ProjectReference Include="..\H.Ipc.Generator\H.Ipc.Generator.csproj" ReferenceOutputAssembly="false" PackAsAnalyzer="true" />
-    <PackageReference Include="H.Formatters.System.Text.Json" Version="14.0.0" />
+    <PackageReference Include="H.Formatters.System.Text.Json" Version="15.0.0" />
     <PackageReference Include="H.Generators.Extensions" Version="1.24.0" PrivateAssets="all" IncludeInPackage="true" />
-    <PackageReference Include="H.Pipes.AccessControl" Version="14.0.0" />
+    <PackageReference Include="H.Pipes.AccessControl" Version="15.0.0" />
     <None Include="..\H.Ipc.Generator\bin\$(Configuration)\netstandard2.0\H.Generators.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet" Visible="false" />
   </ItemGroup>
   
