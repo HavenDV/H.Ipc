@@ -75,7 +75,7 @@ var result = await client.GetAnswer("What's the answer to the ultimate question 
 The generated code currently requires C# version 8 and above. You can enable this using the following code in your .csproj file:
 ```xml
 <PropertyGroup>
-  <LangVersion>preview</LangVersion> <!-- or just 8.0 -->
+  <LangVersion>latest</LangVersion> <!-- or just 8.0 -->
 </PropertyGroup>
 ```
 
