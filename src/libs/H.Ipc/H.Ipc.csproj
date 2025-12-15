@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+    <PackageReference Include="System.Text.Json" Version="10.0.1" />
     <ProjectReference Include="..\H.Ipc.Generator\H.Ipc.Generator.csproj" ReferenceOutputAssembly="false" PackAsAnalyzer="true" />
     <PackageReference Include="H.Formatters.System.Text.Json" Version="15.0.0" />
     <PackageReference Include="H.Generators.Extensions" Version="1.24.2" PrivateAssets="all" IncludeInPackage="true" />
