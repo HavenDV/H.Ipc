@@ -4,6 +4,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build-test-publish:
     name: Build, test and publish
@@ -11,6 +15,5 @@ jobs:
     with:
       generate-build-number: false
       conventional-commits-publish-conditions: false
+      nuget-trusted-publishing: true
       additional-test-arguments: '--logger GitHubActions'
-    secrets:
-      nuget-key: ${{ secrets.NUGET_KEY }}
